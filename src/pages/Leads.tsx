@@ -259,71 +259,89 @@ export default function Leads() {
 
           {/* Filtros */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <Select value={filters.status || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+            <Select 
+              value={filters.status || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder="Todos os Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {statusOptions.map(option => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={filters.canal || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, canal: value }))}>
+            <Select 
+              value={filters.canal || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, canal: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Canal" />
+                <SelectValue placeholder="Todos os Canais" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {canalOptions.map(option => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={filters.agendamento || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, agendamento: value }))}>
+            <Select 
+              value={filters.agendamento || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, agendamento: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Agendamento" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="Sim">Sim</SelectItem>
                 <SelectItem value="Não">Não</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={filters.tipoConsulta || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, tipoConsulta: value }))}>
+            <Select 
+              value={filters.tipoConsulta || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, tipoConsulta: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Tipo Consulta" />
+                <SelectValue placeholder="Tipo de Consulta" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {tipoConsultaOptions.map(option => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={filters.objecao || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, objecao: value }))}>
+            <Select 
+              value={filters.objecao || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, objecao: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Objeção" />
+                <SelectValue placeholder="Objeções" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 {objecaoOptions.map(option => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={filters.followUp || ""} onValueChange={(value) => setFilters(prev => ({ ...prev, followUp: value }))}>
+            <Select 
+              value={filters.followUp || undefined} 
+              onValueChange={(value) => setFilters(prev => ({ ...prev, followUp: value === "all" ? "" : value }))}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Follow Up" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {followUpOptions.map(option => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}
