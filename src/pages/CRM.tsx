@@ -21,20 +21,8 @@ import {
   Search,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-// Tipos
-interface Lead {
-  id: string;
-  nome: string;
-  telefone: string;
-  motivo: string;
-  canal: string;
-  dataContato: string;
-  ultimaAtualizacao: string;
-  status: 'inicio' | 'qualificacao-lead' | 'qualificacao-consulta' | 'agendado';
-  prioridade: 'alta' | 'media' | 'baixa';
-  observacoes?: string;
-}
+import { useData, Lead } from "@/contexts/DataContext";
+import { toast } from "sonner";
 
 // Configuração das colunas do Kanban
 const colunas = [
@@ -64,70 +52,11 @@ const colunas = [
   },
 ];
 
-// Dados simulados
-const leadsIniciais: Lead[] = [
-  {
-    id: '1',
-    nome: 'Maria Silva',
-    telefone: '(11) 99999-9999',
-    motivo: 'Dor nas costas',
-    canal: 'Google',
-    dataContato: '2024-01-15',
-    ultimaAtualizacao: '2024-01-15 09:30',
-    status: 'inicio',
-    prioridade: 'alta',
-  },
-  {
-    id: '2',
-    nome: 'João Santos',
-    telefone: '(11) 88888-8888',
-    motivo: 'Consulta de rotina',
-    canal: 'Instagram',
-    dataContato: '2024-01-14',
-    ultimaAtualizacao: '2024-01-14 14:20',
-    status: 'qualificacao-lead',
-    prioridade: 'media',
-  },
-  {
-    id: '3',
-    nome: 'Ana Costa',
-    telefone: '(11) 77777-7777',
-    motivo: 'Dor de cabeça',
-    canal: 'YouTube',
-    dataContato: '2024-01-13',
-    ultimaAtualizacao: '2024-01-13 16:45',
-    status: 'qualificacao-consulta',
-    prioridade: 'alta',
-  },
-  {
-    id: '4',
-    nome: 'Pedro Oliveira',
-    telefone: '(11) 66666-6666',
-    motivo: 'Dor no joelho',
-    canal: 'Indicação',
-    dataContato: '2024-01-12',
-    ultimaAtualizacao: '2024-01-12 11:15',
-    status: 'agendado',
-    prioridade: 'media',
-  },
-  {
-    id: '5',
-    nome: 'Carla Ferreira',
-    telefone: '(11) 55555-5555',
-    motivo: 'Consulta preventiva',
-    canal: 'Google',
-    dataContato: '2024-01-11',
-    ultimaAtualizacao: '2024-01-11 10:00',
-    status: 'inicio',
-    prioridade: 'baixa',
-  },
-];
-
 // Componente do Card de Lead
 function LeadCard({ lead, onCardClick, onMoveCard }: {
   lead: Lead;
   onCardClick: (lead: Lead) => void;
-  onMoveCard: (leadId: string, novoStatus: Lead['status']) => void;
+  onMoveCard: (leadId: string, novoStatus: Lead['kanbanStatus']) => void;
 }) {
   const getPrioridadeColor = (prioridade: Lead['prioridade']) => {
     switch (prioridade) {
@@ -183,13 +112,37 @@ function LeadCard({ lead, onCardClick, onMoveCard }: {
         </div>
         
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-6 w-6 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.info(`Ligando para ${lead.nome}`);
+            }}
+          >
             <Phone className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-6 w-6 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.info(`Abrindo WhatsApp de ${lead.nome}`);
+            }}
+          >
             <MessageCircle className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-6 w-6 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.info(`Agendando consulta para ${lead.nome}`);
+            }}
+          >
             <Calendar className="h-3 w-3" />
           </Button>
         </div>
@@ -199,7 +152,7 @@ function LeadCard({ lead, onCardClick, onMoveCard }: {
 }
 
 export default function CRM() {
-  const [leads, setLeads] = useState<Lead[]>(leadsIniciais);
+  const { leads, updateLead } = useData();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -210,23 +163,20 @@ export default function CRM() {
     lead.canal.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Agrupar leads por status
+  // Agrupar leads por status kanban
   const leadsPorColuna = colunas.reduce((acc, coluna) => {
-    acc[coluna.id] = filteredLeads.filter(lead => lead.status === coluna.id);
+    acc[coluna.id] = filteredLeads.filter(lead => lead.kanbanStatus === coluna.id);
     return acc;
   }, {} as Record<string, Lead[]>);
 
   // Mover card entre colunas
-  const moveCard = (leadId: string, novoStatus: Lead['status']) => {
-    setLeads(prev => prev.map(lead =>
-      lead.id === leadId
-        ? { ...lead, status: novoStatus, ultimaAtualizacao: new Date().toISOString() }
-        : lead
-    ));
+  const moveCard = (leadId: string, novoStatus: Lead['kanbanStatus']) => {
+    updateLead(leadId, { kanbanStatus: novoStatus });
+    toast.success("Lead movido com sucesso!");
   };
 
   // Handlers de drag and drop
-  const handleDrop = (e: React.DragEvent, status: Lead['status']) => {
+  const handleDrop = (e: React.DragEvent, status: Lead['kanbanStatus']) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData('text/plain');
     moveCard(leadId, status);
@@ -292,7 +242,7 @@ export default function CRM() {
             {/* Drop Zone */}
             <div
               className="min-h-[500px] space-y-3 p-2 rounded-lg border-2 border-dashed border-transparent hover:border-border/50 transition-colors"
-              onDrop={(e) => handleDrop(e, coluna.id as Lead['status'])}
+              onDrop={(e) => handleDrop(e, coluna.id as Lead['kanbanStatus'])}
               onDragOver={handleDragOver}
             >
               {leadsPorColuna[coluna.id]?.map((lead) => (
@@ -350,7 +300,7 @@ export default function CRM() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Status Atual</label>
-                  <p className="capitalize">{selectedLead.status.replace('-', ' ')}</p>
+                  <p className="capitalize">{selectedLead.kanbanStatus.replace('-', ' ')}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Prioridade</label>
@@ -370,21 +320,32 @@ export default function CRM() {
                 </div>
                 <div>
                   <label className="text-sm font-medium">Última Atualização</label>
-                  <p>{new Date(selectedLead.ultimaAtualizacao).toLocaleString('pt-BR')}</p>
+                  <p>{new Date(selectedLead.dataContato).toLocaleString('pt-BR')}</p>
                 </div>
               </div>
 
               {/* Ações */}
               <div className="flex gap-2 pt-4 border-t">
-                <Button className="flex-1">
+                <Button 
+                  className="flex-1"
+                  onClick={() => toast.info(`Ligando para ${selectedLead.nome}`)}
+                >
                   <Phone className="h-4 w-4 mr-2" />
                   Ligar
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => toast.info(`Abrindo WhatsApp de ${selectedLead.nome}`)}
+                >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   WhatsApp
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => toast.info(`Agendando consulta para ${selectedLead.nome}`)}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Agendar
                 </Button>
