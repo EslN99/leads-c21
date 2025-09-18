@@ -25,6 +25,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+import { useData, Lead } from "@/contexts/DataContext";
+import {
   Filter,
   Search,
   Plus,
@@ -36,102 +46,36 @@ import {
   X,
 } from "lucide-react";
 
-// Tipos de dados
-interface Lead {
-  id: string;
-  dataContato: string;
-  nome: string;
-  telefone: string;
-  status: string;
-  motivo: string;
-  agendamento: string;
-  tipoConsulta: string;
-  objecao: string;
-  canal: string;
-  followUp: string;
-}
-
 // Status e opções disponíveis
 const statusOptions = ["1º Consulta", "Paciente", "Retorno", "Procedimento", "Outros"];
 const tipoConsultaOptions = ["Plano de Saúde", "Particular", "Outros"];
 const objecaoOptions = ["Localidade", "Plano de Saúde", "Preço", "Horário", "Não responde", "Outra", "Nenhuma"];
-const canalOptions = ["Google", "Instagram", "Youtube", "Indicação"];
+const canalOptions = ["Google", "Instagram", "YouTube", "Indicação"];
 const followUpOptions = ["Agendado", "Prefere Aguardar", "Não responde", "Não há interesse", "Outro"];
-
-// Dados simulados
-const leadsData: Lead[] = [
-  {
-    id: "1",
-    dataContato: "2024-01-15",
-    nome: "Maria Silva",
-    telefone: "(11) 99999-9999",
-    status: "1º Consulta",
-    motivo: "Dor nas costas",
-    agendamento: "Sim",
-    tipoConsulta: "Plano de Saúde",
-    objecao: "Nenhuma",
-    canal: "Google",
-    followUp: "Agendado",
-  },
-  {
-    id: "2",
-    dataContato: "2024-01-14",
-    nome: "João Santos", 
-    telefone: "(11) 88888-8888",
-    status: "Paciente",
-    motivo: "Consulta de rotina",
-    agendamento: "Não",
-    tipoConsulta: "Particular",
-    objecao: "Horário",
-    canal: "Instagram",
-    followUp: "Prefere Aguardar",
-  },
-  {
-    id: "3",
-    dataContato: "2024-01-13",
-    nome: "Ana Costa",
-    telefone: "(11) 77777-7777",
-    status: "Retorno",
-    motivo: "Dor de cabeça",
-    agendamento: "Sim",
-    tipoConsulta: "Plano de Saúde",
-    objecao: "Nenhuma",
-    canal: "Youtube",
-    followUp: "Agendado",
-  },
-  {
-    id: "4",
-    dataContato: "2024-01-12",
-    nome: "Pedro Oliveira",
-    telefone: "(11) 66666-6666",
-    status: "1º Consulta",
-    motivo: "Dor no joelho",
-    agendamento: "Não",
-    tipoConsulta: "Particular",
-    objecao: "Preço",
-    canal: "Indicação",
-    followUp: "Não há interesse",
-  },
-  {
-    id: "5",
-    dataContato: "2024-01-11",
-    nome: "Carla Ferreira",
-    telefone: "(11) 55555-5555",
-    status: "Procedimento",
-    motivo: "Cirurgia menor",
-    agendamento: "Sim",
-    tipoConsulta: "Plano de Saúde",
-    objecao: "Nenhuma",
-    canal: "Google",
-    followUp: "Agendado",
-  },
-];
+const prioridadeOptions = ["alta", "media", "baixa"];
+const kanbanStatusOptions = ["inicio", "qualificacao-lead", "qualificacao-consulta", "agendado"];
 
 export default function Leads() {
-  const [leads, setLeads] = useState<Lead[]>(leadsData);
+  const { leads, addLead, updateLead, deleteLead } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newLead, setNewLead] = useState<Partial<Lead>>({
+    nome: "",
+    telefone: "",
+    dataContato: new Date().toISOString().split('T')[0],
+    statusContato: "1º Consulta",
+    motivo: "",
+    agendamento: "Não",
+    tipoConsulta: "Particular",
+    objecao: "Nenhuma",
+    canal: "Google",
+    followUp: "Prefere Aguardar",
+    kanbanStatus: "inicio",
+    prioridade: "media",
+    observacoes: ""
+  });
 
   // Filtros ativos
   const activeFilters = Object.entries(filters).filter(([_, value]) => value);
@@ -155,11 +99,43 @@ export default function Leads() {
   }, [leads, searchTerm, filters]);
 
   // Função para atualizar lead
-  const updateLead = (id: string, field: keyof Lead, value: string) => {
-    setLeads(prev => prev.map(lead => 
-      lead.id === id ? { ...lead, [field]: value } : lead
-    ));
+  const handleUpdateLead = (id: string, field: keyof Lead, value: string) => {
+    updateLead(id, { [field]: value });
     setEditingCell(null);
+  };
+
+  // Função para adicionar lead
+  const handleAddLead = () => {
+    if (!newLead.nome || !newLead.telefone) {
+      toast({
+        title: "Erro",
+        description: "Nome e telefone são obrigatórios",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    addLead(newLead as Omit<Lead, 'id'>);
+    setIsAddDialogOpen(false);
+    setNewLead({
+      nome: "",
+      telefone: "",
+      dataContato: new Date().toISOString().split('T')[0],
+      statusContato: "1º Consulta",
+      motivo: "",
+      agendamento: "Não",
+      tipoConsulta: "Particular",
+      objecao: "Nenhuma",
+      canal: "Google",
+      followUp: "Prefere Aguardar",
+      kanbanStatus: "inicio",
+      prioridade: "media",
+      observacoes: ""
+    });
+    toast({
+      title: "Sucesso",
+      description: "Lead adicionado com sucesso!"
+    });
   };
 
   // Componente de célula editável
@@ -171,7 +147,7 @@ export default function Leads() {
       return (
         <Select
           value={value}
-          onValueChange={(newValue) => updateLead(lead.id, field, newValue)}
+          onValueChange={(newValue) => handleUpdateLead(lead.id, field, newValue)}
           onOpenChange={(open) => !open && setEditingCell(null)}
         >
           <SelectTrigger className="h-8 text-xs">
@@ -193,10 +169,10 @@ export default function Leads() {
         <Input
           defaultValue={value}
           className="h-8 text-xs"
-          onBlur={(e) => updateLead(lead.id, field, e.target.value)}
+          onBlur={(e) => handleUpdateLead(lead.id, field, e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              updateLead(lead.id, field, (e.target as HTMLInputElement).value);
+              handleUpdateLead(lead.id, field, (e.target as HTMLInputElement).value);
             }
             if (e.key === 'Escape') {
               setEditingCell(null);
@@ -234,10 +210,117 @@ export default function Leads() {
           </p>
         </div>
         
-        <Button className="bg-gradient-brand hover:bg-gradient-brand/90">
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar Lead
-        </Button>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-brand hover:bg-gradient-brand/90">
+              <Plus className="h-4 w-4 mr-2" />
+              Adicionar Lead
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Adicionar Novo Lead</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome *</Label>
+                <Input
+                  id="nome"
+                  value={newLead.nome || ""}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, nome: e.target.value }))}
+                  placeholder="Nome completo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone *</Label>
+                <Input
+                  id="telefone"
+                  value={newLead.telefone || ""}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, telefone: e.target.value }))}
+                  placeholder="(11) 99999-9999"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dataContato">Data do Contato</Label>
+                <Input
+                  id="dataContato"
+                  type="date"
+                  value={newLead.dataContato || ""}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, dataContato: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="statusContato">Status</Label>
+                <Select value={newLead.statusContato} onValueChange={(value) => setNewLead(prev => ({ ...prev, statusContato: value as Lead['statusContato'] }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="motivo">Motivo</Label>
+                <Input
+                  id="motivo"
+                  value={newLead.motivo || ""}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, motivo: e.target.value }))}
+                  placeholder="Motivo do contato"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="canal">Canal</Label>
+                <Select value={newLead.canal} onValueChange={(value) => setNewLead(prev => ({ ...prev, canal: value as Lead['canal'] }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {canalOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tipoConsulta">Tipo de Consulta</Label>
+                <Select value={newLead.tipoConsulta} onValueChange={(value) => setNewLead(prev => ({ ...prev, tipoConsulta: value as Lead['tipoConsulta'] }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tipoConsultaOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="prioridade">Prioridade</Label>
+                <Select value={newLead.prioridade} onValueChange={(value) => setNewLead(prev => ({ ...prev, prioridade: value as Lead['prioridade'] }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {prioridadeOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleAddLead}>
+                Adicionar Lead
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Controles e Filtros */}
@@ -418,9 +501,9 @@ export default function Leads() {
                     <TableCell>
                       <EditableCell lead={lead} field="telefone" />
                     </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="status" options={statusOptions} />
-                    </TableCell>
+                     <TableCell>
+                       <EditableCell lead={lead} field="statusContato" options={statusOptions} />
+                     </TableCell>
                     <TableCell>
                       <EditableCell lead={lead} field="motivo" />
                     </TableCell>
@@ -459,10 +542,16 @@ export default function Leads() {
                             <Edit className="h-4 w-4 mr-2" />
                             Detalhes
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Excluir
-                          </DropdownMenuItem>
+                           <DropdownMenuItem 
+                             className="text-destructive"
+                             onClick={() => {
+                               deleteLead(lead.id);
+                               toast({ title: "Lead excluído com sucesso" });
+                             }}
+                           >
+                             <Trash2 className="h-4 w-4 mr-2" />
+                             Excluir
+                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

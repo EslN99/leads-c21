@@ -6,7 +6,8 @@ import {
   Kanban, 
   Menu,
   X,
-  TrendingUp
+  TrendingUp,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Leads", href: "/leads", icon: Users },
   { name: "CRM Kanban", href: "/crm", icon: Kanban },
+  { name: "Configurações", href: "/settings", icon: Settings },
 ];
 
 export default function Layout() {
