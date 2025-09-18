@@ -37,6 +37,7 @@ interface DataContextType {
     };
   };
   getChartData: () => {
+    contatosPorCanal: Array<{ name: string; value: number; color: string }>;
     agendamentosPorCanal: Array<{ name: string; value: number; color: string }>;
     objecoes: Array<{ name: string; quantidade: number }>;
     funil: Array<{ name: string; value: number; fill: string }>;
@@ -225,16 +226,32 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const getChartData = () => {
-    const canalCounts = leads.reduce((acc, lead) => {
-      acc[lead.canal] = (acc[lead.canal] || 0) + (lead.agendamento === 'Sim' ? 1 : 0);
+    // Contagem de todos os leads por canal (Canal de Contato)
+    const canalContatoCounts = leads.reduce((acc, lead) => {
+      acc[lead.canal] = (acc[lead.canal] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
+    // Contagem apenas de leads agendados por canal (Canal de Agendamento)
+    const canalAgendamentoCounts = leads.reduce((acc, lead) => {
+      if (lead.agendamento === 'Sim') {
+        acc[lead.canal] = (acc[lead.canal] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    const contatosPorCanal = [
+      { name: 'Google', value: canalContatoCounts.Google || 0, color: '#04BF8A' },
+      { name: 'Instagram', value: canalContatoCounts.Instagram || 0, color: '#0A0A20' },
+      { name: 'YouTube', value: canalContatoCounts.YouTube || 0, color: '#5EE0A9' },
+      { name: 'Indicação', value: canalContatoCounts.Indicação || 0, color: '#CCCCCC' },
+    ];
+
     const agendamentosPorCanal = [
-      { name: 'Google', value: canalCounts.Google || 0, color: '#04BF8A' },
-      { name: 'Instagram', value: canalCounts.Instagram || 0, color: '#0A0A20' },
-      { name: 'YouTube', value: canalCounts.YouTube || 0, color: '#5EE0A9' },
-      { name: 'Indicação', value: canalCounts.Indicação || 0, color: '#CCCCCC' },
+      { name: 'Google', value: canalAgendamentoCounts.Google || 0, color: '#04BF8A' },
+      { name: 'Instagram', value: canalAgendamentoCounts.Instagram || 0, color: '#0A0A20' },
+      { name: 'YouTube', value: canalAgendamentoCounts.YouTube || 0, color: '#5EE0A9' },
+      { name: 'Indicação', value: canalAgendamentoCounts.Indicação || 0, color: '#CCCCCC' },
     ];
 
     const objecaoCounts = leads.reduce((acc, lead) => {
@@ -262,6 +279,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ];
 
     return {
+      contatosPorCanal,
       agendamentosPorCanal,
       objecoes,
       funil

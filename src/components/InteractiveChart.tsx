@@ -28,7 +28,7 @@ import { TrendingUp, BarChart3, PieChart as PieChartIcon, LineChart as LineChart
 import { useData } from "@/contexts/DataContext";
 
 type ChartType = 'pie' | 'bar' | 'line' | 'area';
-type DataVariable = 'canal' | 'objecao' | 'status' | 'tipo-consulta' | 'follow-up';
+type DataVariable = 'canal' | 'canal-contato' | 'canal-agendamento' | 'objecao' | 'status' | 'tipo-consulta' | 'follow-up';
 
 const chartTypeOptions = [
   { value: 'pie', label: 'Pizza', icon: PieChartIcon },
@@ -38,7 +38,9 @@ const chartTypeOptions = [
 ];
 
 const dataVariableOptions = [
-  { value: 'canal', label: 'Canal de Contato' },
+  { value: 'canal', label: 'Canal de Contato (Todos)' },
+  { value: 'canal-contato', label: 'Canal de Contato' },
+  { value: 'canal-agendamento', label: 'Canal de Agendamento' },
   { value: 'objecao', label: 'Objeções' },
   { value: 'status', label: 'Status do Contato' },
   { value: 'tipo-consulta', label: 'Tipo de Consulta' },
@@ -69,6 +71,20 @@ export default function InteractiveChart({
       case 'canal':
         counts = leads.reduce((acc, lead) => {
           acc[lead.canal] = (acc[lead.canal] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        break;
+      case 'canal-contato':
+        counts = leads.reduce((acc, lead) => {
+          acc[lead.canal] = (acc[lead.canal] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        break;
+      case 'canal-agendamento':
+        counts = leads.reduce((acc, lead) => {
+          if (lead.agendamento === 'Sim') {
+            acc[lead.canal] = (acc[lead.canal] || 0) + 1;
+          }
           return acc;
         }, {} as Record<string, number>);
         break;

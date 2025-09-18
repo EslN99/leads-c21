@@ -190,11 +190,20 @@ export default function Dashboard() {
       {/* Interactive Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <InteractiveChart 
-          title="Análise por Canal" 
+          title="Canal de Contato" 
           icon={TrendingUp}
           initialChartType="pie"
-          initialVariable="canal"
+          initialVariable="canal-contato"
         />
+        <InteractiveChart 
+          title="Canal de Agendamento" 
+          icon={Calendar}
+          initialChartType="pie"
+          initialVariable="canal-agendamento"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <InteractiveChart 
           title="Principais Objeções" 
           icon={MapPin}
