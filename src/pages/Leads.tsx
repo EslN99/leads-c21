@@ -45,6 +45,8 @@ import {
   Calendar,
   X,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 // Status e opções disponíveis
 const statusOptions = ["1º Consulta", "Paciente", "Retorno", "Procedimento", "Outros"];
@@ -57,6 +59,7 @@ const kanbanStatusOptions = ["inicio", "qualificacao-lead", "qualificacao-consul
 
 export default function Leads() {
   const { leads, addLead, updateLead, deleteLead } = useData();
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [editingCell, setEditingCell] = useState<{id: string, field: string} | null>(null);
@@ -202,10 +205,12 @@ export default function Leads() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Acompanhamento de Leads</h1>
-          <p className="text-muted-foreground">
+          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+            Acompanhamento de Leads
+          </h1>
+          <p className="text-muted-foreground text-sm lg:text-base">
             Gerencie e acompanhe todos os contatos da clínica
           </p>
         </div>
@@ -217,11 +222,11 @@ export default function Leads() {
               Adicionar Lead
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className={cn(isMobile ? "w-[95vw] h-[85vh] max-w-none" : "max-w-2xl")}>
             <DialogHeader>
               <DialogTitle>Adicionar Novo Lead</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className={cn("grid gap-4 py-4", isMobile ? "grid-cols-1 max-h-[65vh] overflow-y-auto" : "grid-cols-2")}>
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome *</Label>
                 <Input
@@ -311,7 +316,7 @@ export default function Leads() {
                 </Select>
               </div>
             </div>
-            <div className="flex justify-end gap-2">
+            <div className={cn("flex gap-2", isMobile ? "flex-col" : "justify-end")}>
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Cancelar
               </Button>
@@ -341,7 +346,7 @@ export default function Leads() {
           </div>
 
           {/* Filtros */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-2 md:grid-cols-4 lg:grid-cols-6")}>
             <Select 
               value={filters.status || undefined} 
               onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === "all" ? "" : value }))}

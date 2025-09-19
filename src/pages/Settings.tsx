@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Settings, Webhook, Zap, TestTube } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
+  const isMobile = useIsMobile();
   const [webhookUrl, setWebhookUrl] = useState("");
   const [n8nUrl, setN8nUrl] = useState("");
   const [n8nApiKey, setN8nApiKey] = useState("");

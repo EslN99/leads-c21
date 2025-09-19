@@ -23,6 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useData, Lead } from "@/contexts/DataContext";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 // Configuração das colunas do Kanban
 const colunas = [
@@ -153,6 +155,7 @@ function LeadCard({ lead, onCardClick, onMoveCard }: {
 
 export default function CRM() {
   const { leads, updateLead } = useData();
+  const isMobile = useIsMobile();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -189,10 +192,12 @@ export default function CRM() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">CRM Kanban</h1>
-          <p className="text-muted-foreground">
+          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+            CRM Kanban
+          </h1>
+          <p className="text-muted-foreground text-sm lg:text-base">
             Gerencie o fluxo de qualificação dos leads
           </p>
         </div>
@@ -225,12 +230,12 @@ export default function CRM() {
       </Card>
 
       {/* Kanban Board */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className={cn("grid gap-4 lg:gap-6", isMobile ? "grid-cols-1 space-y-4" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4")}>
         {colunas.map((coluna) => (
-          <div key={coluna.id}>
+          <div key={coluna.id} className={cn(isMobile && "w-full")}>
             <Card className={`${coluna.cor} border-2`}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center justify-between">
+              <CardHeader className={cn("pb-3", isMobile && "py-2")}>
+                <CardTitle className={cn("font-medium flex items-center justify-between", isMobile ? "text-sm" : "text-sm")}>
                   {coluna.titulo}
                   <Badge variant="secondary" className="ml-2">
                     {leadsPorColuna[coluna.id]?.length || 0}
@@ -241,7 +246,9 @@ export default function CRM() {
             
             {/* Drop Zone */}
             <div
-              className="min-h-[500px] space-y-3 p-2 rounded-lg border-2 border-dashed border-transparent hover:border-border/50 transition-colors"
+              className={cn("space-y-3 p-2 rounded-lg border-2 border-dashed border-transparent hover:border-border/50 transition-colors",
+                isMobile ? "min-h-[200px]" : "min-h-[500px]"
+              )}
               onDrop={(e) => handleDrop(e, coluna.id as Lead['kanbanStatus'])}
               onDragOver={handleDragOver}
             >
@@ -255,7 +262,9 @@ export default function CRM() {
               ))}
               
               {leadsPorColuna[coluna.id]?.length === 0 && (
-                <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+                <div className={cn("flex items-center justify-center text-muted-foreground text-sm", 
+                  isMobile ? "h-16" : "h-32"
+                )}>
                   Nenhum lead nesta etapa
                 </div>
               )}
@@ -266,7 +275,7 @@ export default function CRM() {
 
       {/* Modal de Detalhes do Lead */}
       <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className={cn(isMobile ? "w-[95vw] h-[85vh] max-w-none" : "max-w-2xl")}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
@@ -275,9 +284,9 @@ export default function CRM() {
           </DialogHeader>
           
           {selectedLead && (
-            <div className="space-y-6">
+            <div className={cn("space-y-6", isMobile && "max-h-[70vh] overflow-y-auto")}>
               {/* Informações Básicas */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-2")}>
                 <div>
                   <label className="text-sm font-medium">Nome</label>
                   <p className="text-lg">{selectedLead.nome}</p>
@@ -297,7 +306,7 @@ export default function CRM() {
               </div>
 
               {/* Status e Prioridade */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-2")}>
                 <div>
                   <label className="text-sm font-medium">Status Atual</label>
                   <p className="capitalize">{selectedLead.kanbanStatus.replace('-', ' ')}</p>
@@ -313,7 +322,7 @@ export default function CRM() {
               </div>
 
               {/* Datas */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-2")}>
                 <div>
                   <label className="text-sm font-medium">Data do Contato</label>
                   <p>{new Date(selectedLead.dataContato).toLocaleDateString('pt-BR')}</p>
@@ -325,7 +334,7 @@ export default function CRM() {
               </div>
 
               {/* Ações */}
-              <div className="flex gap-2 pt-4 border-t">
+              <div className={cn("flex gap-2 pt-4 border-t", isMobile ? "flex-col" : "")}>
                 <Button 
                   className="flex-1"
                   onClick={() => toast.info(`Ligando para ${selectedLead.nome}`)}

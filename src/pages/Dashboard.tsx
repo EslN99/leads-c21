@@ -44,10 +44,13 @@ import { useData } from "@/contexts/DataContext";
 import InteractiveChart from "@/components/InteractiveChart";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const { getStats, getChartData, addLead } = useData();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [periodo, setPeriodo] = useState("mes");
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [newLead, setNewLead] = useState({
@@ -131,17 +134,19 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground text-sm lg:text-base">
             Visão geral do desempenho da clínica
           </p>
         </div>
         
         <div className="flex items-center gap-4">
           <Select value={periodo} onValueChange={setPeriodo}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className={cn(isMobile ? "w-full" : "w-[180px]")}>
               <SelectValue placeholder="Selecione o período" />
             </SelectTrigger>
             <SelectContent>
@@ -155,17 +160,17 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {statCards.map((stat) => (
           <Card key={stat.title} className="stats-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
+            <CardContent className={cn("p-4 lg:p-6", isMobile && "space-y-2")}>
+              <div className={cn("flex items-center", isMobile ? "flex-col text-center" : "justify-between")}>
+                <div className={cn(isMobile && "order-2")}>
+                  <p className={cn("font-medium text-muted-foreground", isMobile ? "text-xs" : "text-sm")}>
                     {stat.title}
                   </p>
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold">{stat.value}</p>
+                  <div className="flex items-baseline gap-2 justify-center">
+                    <p className={cn("font-bold", isMobile ? "text-xl" : "text-2xl")}>{stat.value}</p>
                     <Badge
                       variant={stat.trend === "up" ? "default" : "destructive"}
                       className="text-xs flex items-center gap-1"
@@ -178,8 +183,8 @@ export default function Dashboard() {
                     vs. período anterior
                   </p>
                 </div>
-                <div className={`p-3 rounded-lg ${stat.color}`}>
-                  <stat.icon className="h-6 w-6 text-white" />
+                <div className={cn(`p-3 rounded-lg ${stat.color}`, isMobile && "order-1 mb-2")}>
+                  <stat.icon className={cn("text-white", isMobile ? "h-5 w-5" : "h-6 w-6")} />
                 </div>
               </div>
             </CardContent>
@@ -188,7 +193,7 @@ export default function Dashboard() {
       </div>
 
       {/* Interactive Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={cn("grid gap-4 lg:gap-6", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2")}>
         <InteractiveChart 
           title="Canal de Contato" 
           icon={TrendingUp}
@@ -203,7 +208,7 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={cn("grid gap-4 lg:gap-6", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2")}>
         <InteractiveChart 
           title="Principais Objeções" 
           icon={MapPin}
@@ -215,13 +220,13 @@ export default function Dashboard() {
       {/* Funil de Vendas */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
             <Filter className="h-5 w-5 text-primary" />
             Funil de Conversão
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
             <FunnelChart>
               <Tooltip />
               <Funnel
@@ -239,25 +244,25 @@ export default function Dashboard() {
       {/* Ações Rápidas */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
             <Clock className="h-5 w-5 text-primary" />
             Ações Rápidas
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-3")}>
             <Dialog open={isAddLeadOpen} onOpenChange={setIsAddLeadOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="h-16 flex-col gap-2">
-                  <Users className="h-6 w-6" />
+                <Button variant="outline" className={cn("flex-col gap-2", isMobile ? "h-14" : "h-16")}>
+                  <Users className={cn(isMobile ? "h-5 w-5" : "h-6 w-6")} />
                   Adicionar Lead
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className={cn(isMobile && "w-[95vw] h-[90vh] max-w-none")}>
                 <DialogHeader>
                   <DialogTitle>Adicionar Novo Lead</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className={cn("space-y-4", isMobile && "max-h-[70vh] overflow-y-auto")}>
                   <div>
                     <Label htmlFor="nome">Nome *</Label>
                     <Input
@@ -302,7 +307,7 @@ export default function Dashboard() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex gap-2">
+                  <div className={cn("flex gap-2", isMobile ? "flex-col" : "")}>
                     <Button onClick={handleAddLead} className="flex-1">
                       <Plus className="h-4 w-4 mr-2" />
                       Adicionar
@@ -314,12 +319,12 @@ export default function Dashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-            <Button variant="outline" className="h-16 flex-col gap-2" onClick={handleScheduleAppointment}>
-              <Calendar className="h-6 w-6" />
+            <Button variant="outline" className={cn("flex-col gap-2", isMobile ? "h-14" : "h-16")} onClick={handleScheduleAppointment}>
+              <Calendar className={cn(isMobile ? "h-5 w-5" : "h-6 w-6")} />
               Novo Agendamento
             </Button>
-            <Button variant="outline" className="h-16 flex-col gap-2" onClick={handleFollowUp}>
-              <Phone className="h-6 w-6" />
+            <Button variant="outline" className={cn("flex-col gap-2", isMobile ? "h-14" : "h-16")} onClick={handleFollowUp}>
+              <Phone className={cn(isMobile ? "h-5 w-5" : "h-6 w-6")} />
               Follow-up Pendente
             </Button>
           </div>
@@ -327,7 +332,7 @@ export default function Dashboard() {
       </Card>
 
       {/* Gráfico Interativo Adicional */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={cn("grid gap-4 lg:gap-6", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2")}>
         <InteractiveChart 
           title="Status dos Contatos" 
           icon={BarChart3}
