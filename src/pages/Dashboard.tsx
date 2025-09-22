@@ -218,68 +218,84 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Funil de Vendas Futurista */}
+      {/* Funil de Vendas Kanban */}
       <Card className="futuristic-funnel">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-base lg:text-xl font-bold">
             <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 neon-glow">
               <Filter className="h-6 w-6 text-primary" />
             </div>
-            <span className="gradient-text">Funil de Conversão</span>
+            <span className="gradient-text">Pipeline de Conversão</span>
           </CardTitle>
           <p className="text-muted-foreground/70 text-sm">
-            Visualização do processo de conversão de leads
+            Fluxo de leads através das etapas do kanban
           </p>
         </CardHeader>
         <CardContent className="relative z-10">
-          <ResponsiveContainer width="100%" height={isMobile ? 350 : 450}>
-            <FunnelChart>
-              <defs>
-                <linearGradient id="funnelGradient1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
-                </linearGradient>
-                <linearGradient id="funnelGradient2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
-                </linearGradient>
-                <linearGradient id="funnelGradient3" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--chart-3))" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="hsl(var(--chart-3))" stopOpacity={0.3} />
-                </linearGradient>
-                <linearGradient id="funnelGradient4" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--chart-4))" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="hsl(var(--chart-4))" stopOpacity={0.3} />
-                </linearGradient>
-              </defs>
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--primary) / 0.2)',
-                  borderRadius: '12px',
-                  boxShadow: 'var(--shadow-glow)',
-                  color: 'hsl(var(--foreground))'
-                }}
-              />
-              <Funnel
-                dataKey="value"
-                data={chartData.funil.map((item, index) => ({
-                  ...item,
-                  fill: `url(#funnelGradient${(index % 4) + 1})`
-                }))}
-                isAnimationActive
-                animationDuration={1500}
-              >
-                <LabelList 
-                  position="center" 
-                  fill="hsl(var(--foreground))" 
-                  stroke="none" 
-                  fontSize={14}
-                  fontWeight="bold"
-                />
-              </Funnel>
-            </FunnelChart>
-          </ResponsiveContainer>
+          <div className="space-y-2">
+            {chartData.funil.map((stage, index) => {
+              const percentage = chartData.funil.length > 0 ? (stage.value / Math.max(...chartData.funil.map(s => s.value))) * 100 : 0;
+              const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+              
+              return (
+                <div 
+                  key={stage.name}
+                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors[index % colors.length]} 0%, ${colors[index % colors.length]}80 100%)`,
+                    height: `${Math.max(60, percentage * 0.8)}px`,
+                    width: `${Math.max(40, percentage)}%`,
+                    marginLeft: `${(100 - Math.max(40, percentage)) / 2}%`,
+                    boxShadow: `0 4px 20px ${colors[index % colors.length]}40`,
+                  }}
+                >
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-300"></div>
+                  
+                  {/* Content */}
+                  <div className="relative z-10 flex items-center justify-center h-full px-4">
+                    <div className="text-center">
+                      <div className="font-bold text-white text-lg drop-shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        {stage.value}
+                      </div>
+                      <div className="text-white/90 text-sm font-medium drop-shadow-md">
+                        {stage.name}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Border glow */}
+                  <div className="absolute inset-0 rounded-2xl border border-white/20 group-hover:border-white/40 transition-colors duration-300"></div>
+                  
+                  {/* Tooltip on hover */}
+                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm border border-primary/20 rounded-lg px-3 py-1.5 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                    <div className="text-foreground">{stage.name}</div>
+                    <div className="text-primary font-bold">{stage.value} leads</div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-primary/20"></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Legend */}
+          <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {chartData.funil.map((stage, index) => {
+              const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+              return (
+                <div key={`legend-${stage.name}`} className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 border border-border/30">
+                  <div 
+                    className="w-4 h-4 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: colors[index % colors.length] }}
+                  ></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium text-foreground truncate">{stage.name}</div>
+                    <div className="text-xs text-muted-foreground">{stage.value} leads</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 

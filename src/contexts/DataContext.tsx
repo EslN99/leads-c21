@@ -272,10 +272,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, {} as Record<string, number>);
 
     const funil = [
-      { name: 'Contatos Iniciais', value: statusCounts.inicio || 0, fill: '#04BF8A' },
-      { name: 'Qualificação Lead', value: statusCounts['qualificacao-lead'] || 0, fill: '#0A0A20' },
-      { name: 'Qualificação Consulta', value: statusCounts['qualificacao-consulta'] || 0, fill: '#5EE0A9' },
-      { name: 'Agendamentos', value: statusCounts.agendado || 0, fill: '#0A0A2F' },
+      { name: 'Primeiro Contato', value: statusCounts.inicio || 0, fill: 'hsl(var(--chart-1))' },
+      { name: 'Qualificação do Lead', value: statusCounts['qualificacao-lead'] || 0, fill: 'hsl(var(--chart-2))' },
+      { name: 'Qualificação da Consulta', value: statusCounts['qualificacao-consulta'] || 0, fill: 'hsl(var(--chart-3))' },
+      { name: 'Agendamentos Confirmados', value: statusCounts.agendado || 0, fill: 'hsl(var(--chart-4))' },
     ];
 
     return {
