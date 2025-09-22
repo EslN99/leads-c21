@@ -231,8 +231,8 @@ export default function Dashboard() {
             Fluxo de leads através das etapas do kanban
           </p>
         </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="space-y-2">
+        <CardContent className="relative z-10 pt-16 pb-8">
+          <div className="space-y-3 relative">
             {chartData.funil.map((stage, index) => {
               const percentage = chartData.funil.length > 0 ? (stage.value / Math.max(...chartData.funil.map(s => s.value))) * 100 : 0;
               const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
@@ -240,10 +240,10 @@ export default function Dashboard() {
               return (
                 <div 
                   key={stage.name}
-                  className="group relative overflow-hidden rounded-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
+                  className="group relative overflow-visible rounded-2xl transition-all duration-500 hover:scale-105 cursor-pointer"
                   style={{
                     background: `linear-gradient(135deg, ${colors[index % colors.length]} 0%, ${colors[index % colors.length]}80 100%)`,
-                    height: `${Math.max(60, percentage * 0.8)}px`,
+                    height: `${Math.max(70, percentage * 0.9 + 20)}px`,
                     width: `${Math.max(40, percentage)}%`,
                     marginLeft: `${(100 - Math.max(40, percentage)) / 2}%`,
                     boxShadow: `0 4px 20px ${colors[index % colors.length]}40`,
@@ -267,11 +267,11 @@ export default function Dashboard() {
                   {/* Border glow */}
                   <div className="absolute inset-0 rounded-2xl border border-white/20 group-hover:border-white/40 transition-colors duration-300"></div>
                   
-                  {/* Tooltip on hover */}
-                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm border border-primary/20 rounded-lg px-3 py-1.5 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
-                    <div className="text-foreground">{stage.name}</div>
-                    <div className="text-primary font-bold">{stage.value} leads</div>
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-primary/20"></div>
+                  {/* Tooltip on hover - repositioned */}
+                  <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm border border-primary/20 rounded-lg px-4 py-2 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 min-w-max">
+                    <div className="text-foreground text-center">{stage.name}</div>
+                    <div className="text-primary font-bold text-center">{stage.value} leads</div>
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-border"></div>
                   </div>
                 </div>
               );
