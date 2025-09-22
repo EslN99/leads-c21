@@ -10,56 +10,68 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cores da marca Consultório 21 */
-    --background: 0 0% 98%;
-    --foreground: 240 100% 8%;
+    /* Tema futurista inspirado na referência */
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 240 100% 8%;
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 100% 8%;
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
     
-    /* Azul escuro principal da marca (#0A0A20) */
-    --primary: 240 52% 9%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 240 52% 15%;
+    /* Verde/teal vibrante como cor primária (#00D4AA) */
+    --primary: 174 100% 42%;
+    --primary-foreground: 222 84% 4.9%;
+    --primary-hover: 174 100% 50%;
     
-    /* Verde da marca (#04BF8A) */
-    --secondary: 165 94% 38%;
-    --secondary-foreground: 0 0% 98%;
-    --secondary-hover: 165 94% 45%;
+    /* Cards com tom mais escuro */
+    --secondary: 217 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-hover: 217 32.6% 22%;
     
-    /* Cinzas neutros da marca */
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 45%;
+    /* Cinzas escuros neutros */
+    --muted: 217 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
     
-    --accent: 165 94% 38%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     
-    --success: 165 94% 38%;
-    --success-foreground: 0 0% 98%;
+    --success: 174 100% 42%;
+    --success-foreground: 222 84% 4.9%;
     
-    --warning: 45 100% 51%;
-    --warning-foreground: 0 0% 98%;
+    --warning: 45 93% 47%;
+    --warning-foreground: 222 84% 4.9%;
     
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
     
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 240 52% 9%;
+    --border: 217 32.6% 17.5%;
+    --input: 217 32.6% 17.5%;
+    --ring: 174 100% 42%;
     
-    /* Gradientes da marca */
-    --gradient-brand: linear-gradient(135deg, hsl(240 52% 9%), hsl(165 94% 38%));
-    --gradient-soft: linear-gradient(135deg, hsl(0 0% 98%), hsl(0 0% 95%));
+    /* Cores dos gráficos futuristas */
+    --chart-1: 174 100% 42%;  /* Verde/teal principal */
+    --chart-2: 267 84% 81%;   /* Roxo/violeta */
+    --chart-3: 331 100% 78%;  /* Pink/magenta */
+    --chart-4: 45 93% 47%;    /* Amarelo/dourado */
+    --chart-5: 28 86% 67%;    /* Laranja */
     
-    /* Sombras elegantes */
-    --shadow-soft: 0 2px 8px -2px hsl(240 52% 9% / 0.1);
-    --shadow-medium: 0 4px 16px -4px hsl(240 52% 9% / 0.15);
-    --shadow-strong: 0 8px 32px -8px hsl(240 52% 9% / 0.2);
+    /* Gradientes futuristas */
+    --gradient-primary: linear-gradient(135deg, hsl(174 100% 42%), hsl(174 100% 52%));
+    --gradient-secondary: linear-gradient(135deg, hsl(217 32.6% 17.5%), hsl(217 32.6% 22%));
+    --gradient-card: linear-gradient(135deg, hsl(222 84% 4.9%) 0%, hsl(217 32.6% 8%) 100%);
+    --gradient-futuristic: linear-gradient(135deg, hsl(174 100% 42% / 0.1), hsl(267 84% 81% / 0.1));
+    --gradient-neon: linear-gradient(135deg, hsl(174 100% 42% / 0.2), hsl(331 100% 78% / 0.2));
     
-    --radius: 8px;
+    /* Sombras com glow futurista */
+    --shadow-soft: 0 4px 12px -2px hsl(174 100% 42% / 0.15);
+    --shadow-medium: 0 8px 24px -4px hsl(174 100% 42% / 0.25);
+    --shadow-strong: 0 16px 48px -8px hsl(174 100% 42% / 0.35);
+    --shadow-glow: 0 0 50px hsl(174 100% 42% / 0.4);
+    --shadow-neon: 0 0 20px hsl(174 100% 42% / 0.6);
+    
+    --radius: 12px;
 
     --sidebar-background: 0 0% 98%;
 
@@ -79,32 +91,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 240 52% 9%;
-    --foreground: 0 0% 98%;
+    /* Mantém o mesmo tema futurista para dark mode */
+    --background: 222 84% 4.9%;
+    --foreground: 210 40% 98%;
     
-    --card: 240 52% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 222 84% 4.9%;
+    --card-foreground: 210 40% 98%;
     
-    --popover: 240 52% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
     
-    --primary: 165 94% 38%;
-    --primary-foreground: 240 52% 9%;
-    --primary-hover: 165 94% 45%;
+    --primary: 174 100% 42%;
+    --primary-foreground: 222 84% 4.9%;
+    --primary-hover: 174 100% 50%;
     
-    --secondary: 240 52% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --secondary-hover: 240 52% 20%;
+    --secondary: 217 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --secondary-hover: 217 32.6% 22%;
     
-    --muted: 240 52% 15%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 217 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
     
-    --accent: 165 94% 38%;
-    --accent-foreground: 240 52% 9%;
+    --accent: 217 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     
-    --border: 240 52% 20%;
-    --input: 240 52% 20%;
-    --ring: 165 94% 38%;
+    --border: 217 32.6% 17.5%;
+    --input: 217 32.6% 17.5%;
+    --ring: 174 100% 42%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -147,23 +160,112 @@ All colors MUST be HSL.
 }
 
 @layer components {
-  /* Componentes customizados para a aplicação */
+  /* Componentes customizados futuristas */
   .table-cell-input {
     @apply w-full h-8 px-2 bg-transparent border-0 focus:ring-0 focus:outline-none;
   }
   
   .kanban-card {
-    @apply bg-card border border-border rounded-lg p-3 shadow-sm 
-           hover:shadow-md transition-all duration-200 cursor-pointer;
+    @apply bg-card border border-border rounded-xl p-3 shadow-sm 
+           hover:shadow-md transition-all duration-300 cursor-pointer
+           hover:border-primary/30;
   }
   
   .filter-badge {
-    @apply inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium
-           bg-primary/10 text-primary border border-primary/20;
+    @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
+           bg-primary/10 text-primary border border-primary/20 
+           hover:bg-primary/20 transition-all duration-200;
   }
   
   .stats-card {
-    @apply bg-gradient-to-br from-card to-muted/30 border border-border 
-           rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200;
+    background: var(--gradient-card);
+    @apply border border-border/30 rounded-2xl p-6 
+           transition-all duration-500 cursor-pointer
+           hover:border-primary/30 relative overflow-hidden;
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-futuristic);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .stats-card:hover::before {
+    opacity: 1;
+  }
+  
+  .stats-card > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .futuristic-card {
+    background: var(--gradient-card);
+    @apply border border-primary/20 rounded-2xl 
+           relative overflow-hidden;
+    box-shadow: var(--shadow-medium), inset 0 1px 0 hsl(var(--primary) / 0.1);
+  }
+  
+  .futuristic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .futuristic-card:hover::before {
+    left: 100%;
+  }
+  
+  .neon-glow {
+    box-shadow: var(--shadow-neon);
+  }
+  
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .futuristic-funnel {
+    background: var(--gradient-card);
+    @apply border border-primary/20 rounded-2xl p-8;
+    box-shadow: var(--shadow-strong);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .futuristic-funnel::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, hsl(var(--primary) / 0.03), transparent);
+    animation: rotate 20s linear infinite;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }

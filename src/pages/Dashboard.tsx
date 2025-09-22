@@ -166,25 +166,26 @@ export default function Dashboard() {
             <CardContent className={cn("p-4 lg:p-6", isMobile && "space-y-2")}>
               <div className={cn("flex items-center", isMobile ? "flex-col text-center" : "justify-between")}>
                 <div className={cn(isMobile && "order-2")}>
-                  <p className={cn("font-medium text-muted-foreground", isMobile ? "text-xs" : "text-sm")}>
+                  <p className={cn("font-medium text-muted-foreground/80", isMobile ? "text-xs" : "text-sm")}>
                     {stat.title}
                   </p>
                   <div className="flex items-baseline gap-2 justify-center">
-                    <p className={cn("font-bold", isMobile ? "text-xl" : "text-2xl")}>{stat.value}</p>
+                    <p className={cn("font-bold gradient-text", isMobile ? "text-xl" : "text-2xl")}>{stat.value}</p>
                     <Badge
                       variant={stat.trend === "up" ? "default" : "destructive"}
-                      className="text-xs flex items-center gap-1"
+                      className={cn("text-xs flex items-center gap-1 bg-primary/10 text-primary border-primary/20", 
+                        stat.trend === "up" ? "neon-glow" : "")}
                     >
                       {stat.trend === "up" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
                       {stat.change}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground/60 mt-1">
                     vs. período anterior
                   </p>
                 </div>
-                <div className={cn(`p-3 rounded-lg ${stat.color}`, isMobile && "order-1 mb-2")}>
-                  <stat.icon className={cn("text-white", isMobile ? "h-5 w-5" : "h-6 w-6")} />
+                <div className={cn("p-4 rounded-2xl bg-primary/10 border border-primary/20", isMobile && "order-1 mb-2")}>
+                  <stat.icon className={cn("text-primary", isMobile ? "h-6 w-6" : "h-8 w-8")} />
                 </div>
               </div>
             </CardContent>
@@ -217,24 +218,65 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Funil de Vendas */}
-      <Card>
+      {/* Funil de Vendas Futurista */}
+      <Card className="futuristic-funnel">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
-            <Filter className="h-5 w-5 text-primary" />
-            Funil de Conversão
+          <CardTitle className="flex items-center gap-3 text-base lg:text-xl font-bold">
+            <div className="p-2 rounded-xl bg-primary/10 border border-primary/20 neon-glow">
+              <Filter className="h-6 w-6 text-primary" />
+            </div>
+            <span className="gradient-text">Funil de Conversão</span>
           </CardTitle>
+          <p className="text-muted-foreground/70 text-sm">
+            Visualização do processo de conversão de leads
+          </p>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
+        <CardContent className="relative z-10">
+          <ResponsiveContainer width="100%" height={isMobile ? 350 : 450}>
             <FunnelChart>
-              <Tooltip />
+              <defs>
+                <linearGradient id="funnelGradient1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
+                </linearGradient>
+                <linearGradient id="funnelGradient2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
+                </linearGradient>
+                <linearGradient id="funnelGradient3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--chart-3))" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="hsl(var(--chart-3))" stopOpacity={0.3} />
+                </linearGradient>
+                <linearGradient id="funnelGradient4" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--chart-4))" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="hsl(var(--chart-4))" stopOpacity={0.3} />
+                </linearGradient>
+              </defs>
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--primary) / 0.2)',
+                  borderRadius: '12px',
+                  boxShadow: 'var(--shadow-glow)',
+                  color: 'hsl(var(--foreground))'
+                }}
+              />
               <Funnel
                 dataKey="value"
-                data={chartData.funil}
+                data={chartData.funil.map((item, index) => ({
+                  ...item,
+                  fill: `url(#funnelGradient${(index % 4) + 1})`
+                }))}
                 isAnimationActive
+                animationDuration={1500}
               >
-                <LabelList position="center" fill="#fff" stroke="none" />
+                <LabelList 
+                  position="center" 
+                  fill="hsl(var(--foreground))" 
+                  stroke="none" 
+                  fontSize={14}
+                  fontWeight="bold"
+                />
               </Funnel>
             </FunnelChart>
           </ResponsiveContainer>
