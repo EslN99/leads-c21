@@ -227,53 +227,87 @@ export default function Dashboard() {
       case 'stat-card':
         return isMobile ? "col-span-1" : "col-span-1 sm:col-span-1 lg:col-span-1";
       case 'chart':
-        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-2";
+        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-2 xl:col-span-1";
       case 'funnel':
-        return "col-span-1 lg:col-span-4";
+        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-3 xl:col-span-4";
       case 'actions':
-        return "col-span-1 lg:col-span-4";
+        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-3 xl:col-span-4";
       default:
         return "col-span-1";
     }
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className={cn("space-y-4 relative", isMobile ? "space-y-3" : "space-y-6")}>
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
-        <div>
-          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+      <div className={cn(
+        "flex flex-col gap-3 justify-between",
+        isMobile ? "space-y-3" : "md:flex-row md:items-center md:gap-4"
+      )}>
+        <div className="min-w-0 flex-1">
+          <h1 className={cn(
+            "font-bold tracking-tight gradient-text", 
+            isMobile ? "text-xl" : "text-2xl lg:text-3xl"
+          )}>
             Dashboard Modular
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base">
-            Personalize sua visão geral arrastando e organizando os widgets
+          <p className={cn(
+            "text-muted-foreground mt-1", 
+            isMobile ? "text-xs" : "text-sm lg:text-base"
+          )}>
+            {isMobile 
+              ? "Personalize com widgets arrastar e soltar" 
+              : "Personalize sua visão geral arrastando e organizando os widgets"
+            }
           </p>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className={cn("flex items-center gap-3", isMobile && "flex-col w-full")}>
           <Select value={periodo} onValueChange={setPeriodo}>
-            <SelectTrigger className={cn(isMobile ? "w-full" : "w-[180px]")}>
-              <SelectValue placeholder="Selecione o período" />
+            <SelectTrigger className={cn(isMobile ? "w-full" : "w-[140px] lg:w-[180px]")}>
+              <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="hoje">Hoje</SelectItem>
               <SelectItem value="semana">Esta Semana</SelectItem>
               <SelectItem value="mes">Este Mês</SelectItem>
-              <SelectItem value="personalizado">Período Personalizado</SelectItem>
+              <SelectItem value="personalizado">Personalizado</SelectItem>
             </SelectContent>
           </Select>
+          
+          {!isMobile && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg text-xs text-muted-foreground">
+              <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+              {widgets.length} widgets ativos
+            </div>
+          )}
         </div>
       </div>
 
       {/* Empty State */}
       {widgets.length === 0 && (
-        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+        <div className={cn(
+          "text-center border-2 border-dashed border-border rounded-xl bg-muted/20",
+          isMobile ? "py-8 px-4" : "py-12 px-6"
+        )}>
           <div className="mx-auto max-w-sm">
-            <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Dashboard Vazio</h3>
-            <p className="text-muted-foreground mb-4">
-              Comece adicionando widgets para personalizar seu dashboard.
+            <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto mb-4">
+              <TrendingUp className={cn("text-primary", isMobile ? "h-8 w-8" : "h-12 w-12")} />
+            </div>
+            <h3 className={cn("font-semibold mb-2", isMobile ? "text-base" : "text-lg")}>
+              Dashboard Vazio
+            </h3>
+            <p className={cn("text-muted-foreground mb-4", isMobile ? "text-xs" : "text-sm")}>
+              {isMobile 
+                ? "Toque no + para adicionar widgets" 
+                : "Comece adicionando widgets para personalizar seu dashboard"
+              }
             </p>
+            {isMobile && (
+              <div className="text-xs text-primary bg-primary/10 px-3 py-1 rounded-full inline-block">
+                Botão + no canto inferior direito
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -285,7 +319,13 @@ export default function Dashboard() {
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <div className={cn(
+            "grid gap-3 transition-all duration-300",
+            isMobile 
+              ? "grid-cols-1" 
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+            isMobile ? "gap-3" : "lg:gap-4 xl:gap-6"
+          )}>
             {widgets.map((widget) => (
               <div 
                 key={widget.id} 

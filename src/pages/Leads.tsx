@@ -203,30 +203,57 @@ export default function Leads() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className={cn("space-y-4", isMobile ? "space-y-3" : "space-y-6")}>
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
-        <div>
-          <h1 className={cn("font-bold tracking-tight", isMobile ? "text-2xl" : "text-3xl")}>
+      <div className={cn(
+        "flex flex-col gap-3 justify-between",
+        isMobile ? "space-y-3" : "md:flex-row md:items-center md:gap-4"
+      )}>
+        <div className="min-w-0 flex-1">
+          <h1 className={cn(
+            "font-bold tracking-tight gradient-text", 
+            isMobile ? "text-xl" : "text-2xl lg:text-3xl"
+          )}>
             Acompanhamento de Leads
           </h1>
-          <p className="text-muted-foreground text-sm lg:text-base">
-            Gerencie e acompanhe todos os contatos da clínica
+          <p className={cn(
+            "text-muted-foreground mt-1", 
+            isMobile ? "text-xs" : "text-sm lg:text-base"
+          )}>
+            {isMobile 
+              ? "Gerencie todos os contatos" 
+              : "Gerencie e acompanhe todos os contatos da clínica"
+            }
           </p>
         </div>
         
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-brand hover:bg-gradient-brand/90">
+            <Button className={cn(
+              "bg-gradient-primary hover:bg-gradient-primary/90 neon-glow",
+              isMobile ? "w-full" : "w-auto"
+            )}>
               <Plus className="h-4 w-4 mr-2" />
-              Adicionar Lead
+              {isMobile ? "Adicionar" : "Adicionar Lead"}
             </Button>
           </DialogTrigger>
-          <DialogContent className={cn(isMobile ? "w-[95vw] h-[85vh] max-w-none" : "max-w-2xl")}>
+          <DialogContent className={cn(
+            "max-w-full", 
+            isMobile 
+              ? "w-[95vw] h-[90vh] max-w-none p-4" 
+              : "max-w-4xl max-h-[85vh]"
+          )}>
             <DialogHeader>
-              <DialogTitle>Adicionar Novo Lead</DialogTitle>
+              <DialogTitle className={cn(isMobile ? "text-base" : "text-lg")}>
+                Adicionar Novo Lead
+              </DialogTitle>
             </DialogHeader>
-            <div className={cn("grid gap-4 py-4", isMobile ? "grid-cols-1 max-h-[65vh] overflow-y-auto" : "grid-cols-2")}>
+            <div className={cn(
+              "grid gap-3 py-4", 
+              isMobile 
+                ? "grid-cols-1 max-h-[70vh] overflow-y-auto space-y-1" 
+                : "grid-cols-2 lg:grid-cols-3 gap-4"
+            )}>
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome *</Label>
                 <Input
@@ -351,8 +378,8 @@ export default function Leads() {
               value={filters.status || undefined} 
               onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === "all" ? "" : value }))}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Todos os Status" />
+              <SelectTrigger className={cn(isMobile ? "h-9 text-xs" : "h-10")}>
+                <SelectValue placeholder={isMobile ? "Status" : "Todos os Status"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -366,8 +393,8 @@ export default function Leads() {
               value={filters.canal || undefined} 
               onValueChange={(value) => setFilters(prev => ({ ...prev, canal: value === "all" ? "" : value }))}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Todos os Canais" />
+              <SelectTrigger className={cn(isMobile ? "h-9 text-xs" : "h-10")}>
+                <SelectValue placeholder={isMobile ? "Canal" : "Todos os Canais"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -381,8 +408,8 @@ export default function Leads() {
               value={filters.agendamento || undefined} 
               onValueChange={(value) => setFilters(prev => ({ ...prev, agendamento: value === "all" ? "" : value }))}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Agendamento" />
+              <SelectTrigger className={cn(isMobile ? "h-9 text-xs" : "h-10")}>
+                <SelectValue placeholder={isMobile ? "Agenda" : "Agendamento"} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -391,50 +418,54 @@ export default function Leads() {
               </SelectContent>
             </Select>
 
-            <Select 
-              value={filters.tipoConsulta || undefined} 
-              onValueChange={(value) => setFilters(prev => ({ ...prev, tipoConsulta: value === "all" ? "" : value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo de Consulta" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {tipoConsultaOptions.map(option => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {!isMobile && (
+              <>
+                <Select 
+                  value={filters.tipoConsulta || undefined} 
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, tipoConsulta: value === "all" ? "" : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tipo de Consulta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    {tipoConsultaOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <Select 
-              value={filters.objecao || undefined} 
-              onValueChange={(value) => setFilters(prev => ({ ...prev, objecao: value === "all" ? "" : value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Objeções" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {objecaoOptions.map(option => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <Select 
+                  value={filters.objecao || undefined} 
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, objecao: value === "all" ? "" : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Objeções" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    {objecaoOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <Select 
-              value={filters.followUp || undefined} 
-              onValueChange={(value) => setFilters(prev => ({ ...prev, followUp: value === "all" ? "" : value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Follow Up" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {followUpOptions.map(option => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <Select 
+                  value={filters.followUp || undefined} 
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, followUp: value === "all" ? "" : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Follow Up" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    {followUpOptions.map(option => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
+            )}
           </div>
 
           {/* Filtros Ativos */}
@@ -467,104 +498,193 @@ export default function Leads() {
       </Card>
 
       {/* Tabela de Leads */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Leads ({filteredLeads.length})</CardTitle>
-            <div className="text-sm text-muted-foreground">
-              Clique em qualquer célula para editar
-            </div>
+      <Card className="futuristic-card">
+        <CardHeader className={cn("pb-3", isMobile && "pb-2")}>
+          <div className={cn(
+            "flex items-center justify-between",
+            isMobile && "flex-col items-start gap-2"
+          )}>
+            <CardTitle className={cn(isMobile ? "text-base" : "text-lg")}>
+              Leads ({filteredLeads.length})
+            </CardTitle>
+            {!isMobile && (
+              <div className="text-sm text-muted-foreground">
+                Clique em qualquer célula para editar
+              </div>
+            )}
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data Contato</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Motivo</TableHead>
-                  <TableHead>Agendamento</TableHead>
-                  <TableHead>Tipo Consulta</TableHead>
-                  <TableHead>Objeção</TableHead>
-                  <TableHead>Canal</TableHead>
-                  <TableHead>Follow Up</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLeads.map((lead) => (
-                  <TableRow key={lead.id}>
-                    <TableCell>
-                      <EditableCell lead={lead} field="dataContato" />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="nome" />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="telefone" />
-                    </TableCell>
-                     <TableCell>
-                       <EditableCell lead={lead} field="statusContato" options={statusOptions} />
-                     </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="motivo" />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="agendamento" options={["Sim", "Não"]} />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="tipoConsulta" options={tipoConsultaOptions} />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="objecao" options={objecaoOptions} />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="canal" options={canalOptions} />
-                    </TableCell>
-                    <TableCell>
-                      <EditableCell lead={lead} field="followUp" options={followUpOptions} />
-                    </TableCell>
-                    <TableCell>
+        <CardContent className={cn(isMobile ? "p-0" : "")}>
+          {isMobile ? (
+            /* Mobile Card View */
+            <div className="space-y-3 p-3">
+              {filteredLeads.map((lead) => (
+                <Card key={lead.id} className="p-4 bg-muted/20 border-border/50">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-sm">{lead.nome}</h3>
+                        <p className="text-xs text-muted-foreground">{lead.telefone}</p>
+                      </div>
+                      <Badge variant={lead.agendamento === 'Sim' ? 'default' : 'secondary'} className="text-xs">
+                        {lead.agendamento === 'Sim' ? 'Agendado' : 'Pendente'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">Status:</span>
+                        <p className="font-medium">{lead.statusContato}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Canal:</span>
+                        <p className="font-medium">{lead.canal}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Data:</span>
+                        <p className="font-medium">{new Date(lead.dataContato).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Follow-up:</span>
+                        <p className="font-medium">{lead.followUp}</p>
+                      </div>
+                    </div>
+                    
+                    {lead.motivo && (
+                      <div className="text-xs">
+                        <span className="text-muted-foreground">Motivo:</span>
+                        <p className="text-foreground mt-1">{lead.motivo}</p>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2 pt-2 border-t border-border/50">
+                      <Button size="sm" variant="outline" className="flex-1 h-8 text-xs">
+                        <Phone className="h-3 w-3 mr-1" />
+                        Ligar
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 h-8 text-xs">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Agendar
+                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-3 w-3" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem>
-                            <Phone className="h-4 w-4 mr-2" />
-                            Ligar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Calendar className="h-4 w-4 mr-2" />
-                            Agendar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
                             <Edit className="h-4 w-4 mr-2" />
                             Detalhes
                           </DropdownMenuItem>
-                           <DropdownMenuItem 
-                             className="text-destructive"
-                             onClick={() => {
-                               deleteLead(lead.id);
-                               toast({ title: "Lead excluído com sucesso" });
-                             }}
-                           >
-                             <Trash2 className="h-4 w-4 mr-2" />
-                             Excluir
-                           </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => {
+                              deleteLead(lead.id);
+                              toast({ title: "Lead excluído com sucesso" });
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Excluir
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Desktop Table View */
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data Contato</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Telefone</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Motivo</TableHead>
+                    <TableHead>Agendamento</TableHead>
+                    <TableHead>Tipo Consulta</TableHead>
+                    <TableHead>Objeção</TableHead>
+                    <TableHead>Canal</TableHead>
+                    <TableHead>Follow Up</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredLeads.map((lead) => (
+                    <TableRow key={lead.id}>
+                      <TableCell>
+                        <EditableCell lead={lead} field="dataContato" />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="nome" />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="telefone" />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="statusContato" options={statusOptions} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="motivo" />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="agendamento" options={["Sim", "Não"]} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="tipoConsulta" options={tipoConsultaOptions} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="objecao" options={objecaoOptions} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="canal" options={canalOptions} />
+                      </TableCell>
+                      <TableCell>
+                        <EditableCell lead={lead} field="followUp" options={followUpOptions} />
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>
+                              <Phone className="h-4 w-4 mr-2" />
+                              Ligar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Calendar className="h-4 w-4 mr-2" />
+                              Agendar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Detalhes
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={() => {
+                                deleteLead(lead.id);
+                                toast({ title: "Lead excluído com sucesso" });
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

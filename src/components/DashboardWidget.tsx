@@ -58,6 +58,7 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
     const statConfigs = {
       agendamentos: {
         title: "Total de Agendamentos",
+        shortTitle: "Agendamentos",
         value: stats.totalAgendamentos.toString(),
         change: `${stats.comparacao.totalAgendamentos > 0 ? '+' : ''}${stats.comparacao.totalAgendamentos}%`,
         trend: stats.comparacao.totalAgendamentos >= 0 ? "up" : "down" as const,
@@ -66,6 +67,7 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
       },
       leads: {
         title: "Novos Leads",
+        shortTitle: "Leads",
         value: stats.novosLeads.toString(),
         change: `${stats.comparacao.novosLeads > 0 ? '+' : ''}${stats.comparacao.novosLeads}%`,
         trend: stats.comparacao.novosLeads >= 0 ? "up" : "down" as const,
@@ -74,6 +76,7 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
       },
       conversao: {
         title: "Taxa de Conversão",
+        shortTitle: "Conversão",
         value: `${stats.taxaConversao}%`,
         change: `${stats.comparacao.taxaConversao > 0 ? '+' : ''}${stats.comparacao.taxaConversao}%`,
         trend: stats.comparacao.taxaConversao >= 0 ? "up" : "down" as const,
@@ -81,7 +84,8 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
         color: "bg-success",
       },
       ativos: {
-        title: "Leads Ativos",
+        title: "Leads Ativos", 
+        shortTitle: "Ativos",
         value: stats.leadsAtivos.toString(),
         change: `${stats.comparacao.leadsAtivos > 0 ? '+' : ''}${stats.comparacao.leadsAtivos}%`,
         trend: stats.comparacao.leadsAtivos >= 0 ? "up" : "down" as const,
@@ -93,28 +97,32 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
     const stat = statConfigs[statType];
 
     return (
-      <CardContent className="p-4 lg:p-6">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-muted-foreground/80 text-sm">
-              {stat.title}
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-muted-foreground/80 text-xs sm:text-sm truncate">
+              <span className="hidden sm:inline">{stat.title}</span>
+              <span className="sm:hidden">{stat.shortTitle}</span>
             </p>
-            <div className="flex items-baseline gap-2">
-              <p className="font-bold gradient-text text-2xl">{stat.value}</p>
+            <div className="flex items-baseline gap-1.5 sm:gap-2 mt-1">
+              <p className="font-bold gradient-text text-lg sm:text-xl lg:text-2xl">
+                {stat.value}
+              </p>
               <Badge
                 variant={stat.trend === "up" ? "default" : "destructive"}
-                className="text-xs flex items-center gap-1 bg-primary/10 text-primary border-primary/20"
+                className="text-xs flex items-center gap-1 bg-primary/10 text-primary border-primary/20 px-1.5 py-0.5"
               >
-                {stat.trend === "up" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                {stat.change}
+                {stat.trend === "up" ? <ArrowUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> : <ArrowDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
+                <span className="hidden sm:inline">{stat.change}</span>
+                <span className="sm:hidden">{stat.trend === "up" ? "+" : "-"}</span>
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground/60 mt-1">
+            <p className="text-xs text-muted-foreground/60 mt-0.5 sm:mt-1 hidden sm:block">
               vs. período anterior
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
-            <stat.icon className="h-8 w-8 text-primary" />
+          <div className="p-2.5 sm:p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-primary/10 border border-primary/20 flex-shrink-0 ml-2">
+            <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-primary" />
           </div>
         </div>
       </CardContent>
