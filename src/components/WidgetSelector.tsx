@@ -138,18 +138,21 @@ export default function WidgetSelector({ onAddWidget }: WidgetSelectorProps) {
         break;
       
       case 'chart':
-        const iconMap: Record<string, any> = {
-          TrendingUp,
-          BarChart3,
-          Users,
-          Calendar,
-          Phone,
+        const iconMap: Record<string, React.ComponentType<any>> = {
+          'TrendingUp': TrendingUp,
+          'BarChart3': BarChart3,
+          'Users': Users,
+          'Calendar': Calendar,
+          'Phone': Phone,
         };
+        
+        // Ensure we always have a valid icon component
+        const selectedIcon = iconMap[chartConfig.icon] || TrendingUp;
         
         config = {
           type: 'chart',
           title: chartConfig.title || 'Novo Gráfico',
-          icon: iconMap[chartConfig.icon] || TrendingUp,
+          icon: selectedIcon,
           chartType: chartConfig.chartType as any,
           variable: chartConfig.variable as any,
         };

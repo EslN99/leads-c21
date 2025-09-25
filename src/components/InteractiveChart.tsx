@@ -65,7 +65,7 @@ export default function InteractiveChart({
   initialVariable = 'canal'
 }: {
   title: string;
-  icon: any;
+  icon: React.ComponentType<any>;
   initialChartType?: ChartType;
   initialVariable?: DataVariable;
 }) {
