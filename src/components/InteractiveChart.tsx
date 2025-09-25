@@ -72,6 +72,7 @@ export default function InteractiveChart({
   const { leads } = useData();
   const [chartType, setChartType] = useState<ChartType>(initialChartType);
   const [dataVariable, setDataVariable] = useState<DataVariable>(initialVariable);
+  const IconComponent = typeof Icon === 'function' ? Icon : TrendingUp;
 
   const generateChartData = () => {
     let counts: Record<string, number> = {};
@@ -198,7 +199,7 @@ export default function InteractiveChart({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Icon className="h-5 w-5 text-primary" />
+            <IconComponent className="h-5 w-5 text-primary" />
             {title}
           </CardTitle>
           <div className="flex flex-col sm:flex-row gap-2">
