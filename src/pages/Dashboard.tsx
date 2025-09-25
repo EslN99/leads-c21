@@ -47,9 +47,18 @@ import WidgetSelector from "@/components/WidgetSelector";
 interface DashboardWidgetItem {
   id: string;
   config: WidgetConfig;
+  size?: { width: number; height: number };
 }
 
-function SortableWidget({ widget, onRemove }: { widget: DashboardWidgetItem; onRemove: (id: string) => void }) {
+function SortableWidget({ 
+  widget, 
+  onRemove, 
+  onResize 
+}: { 
+  widget: DashboardWidgetItem; 
+  onRemove: (id: string) => void;
+  onResize: (id: string, size: { width: number; height: number }) => void;
+}) {
   const {
     attributes,
     listeners,
@@ -69,7 +78,9 @@ function SortableWidget({ widget, onRemove }: { widget: DashboardWidgetItem; onR
       <DashboardWidget 
         id={widget.id}
         config={widget.config}
+        size={widget.size}
         onRemove={onRemove}
+        onResize={onResize}
         isDragging={isDragging}
       />
     </div>
@@ -118,19 +129,23 @@ export default function Dashboard() {
     const defaultWidgets: DashboardWidgetItem[] = [
       {
         id: 'stat-1',
-        config: { type: 'stat-card', statType: 'agendamentos' }
+        config: { type: 'stat-card', statType: 'agendamentos' },
+        size: { width: 280, height: 140 }
       },
       {
         id: 'stat-2', 
-        config: { type: 'stat-card', statType: 'leads' }
+        config: { type: 'stat-card', statType: 'leads' },
+        size: { width: 280, height: 140 }
       },
       {
         id: 'stat-3',
-        config: { type: 'stat-card', statType: 'conversao' }
+        config: { type: 'stat-card', statType: 'conversao' },
+        size: { width: 280, height: 140 }
       },
       {
         id: 'stat-4',
-        config: { type: 'stat-card', statType: 'ativos' }
+        config: { type: 'stat-card', statType: 'ativos' },
+        size: { width: 280, height: 140 }
       },
       {
         id: 'chart-1',
@@ -140,7 +155,8 @@ export default function Dashboard() {
           icon: TrendingUp,
           chartType: 'pie',
           variable: 'canal-contato'
-        }
+        },
+        size: { width: 400, height: 350 }
       },
       {
         id: 'chart-2',
@@ -150,15 +166,18 @@ export default function Dashboard() {
           icon: Calendar,
           chartType: 'pie',
           variable: 'canal-agendamento'
-        }
+        },
+        size: { width: 400, height: 350 }
       },
       {
         id: 'funnel-1',
-        config: { type: 'funnel' }
+        config: { type: 'funnel' },
+        size: { width: 600, height: 400 }
       },
       {
         id: 'actions-1',
-        config: { type: 'actions' }
+        config: { type: 'actions' },
+        size: { width: 500, height: 200 }
       }
     ];
     setWidgets(defaultWidgets);
@@ -185,9 +204,25 @@ export default function Dashboard() {
   };
 
   const handleAddWidget = (config: WidgetConfig) => {
+    const getDefaultSize = () => {
+      switch (config.type) {
+        case 'stat-card':
+          return { width: 280, height: 140 };
+        case 'chart':
+          return { width: 400, height: 350 };
+        case 'funnel':
+          return { width: 600, height: 400 };
+        case 'actions':
+          return { width: 500, height: 200 };
+        default:
+          return { width: 320, height: 280 };
+      }
+    };
+
     const newWidget: DashboardWidgetItem = {
       id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       config,
+      size: getDefaultSize(),
     };
     setWidgets(prev => [...prev, newWidget]);
     toast.success("Widget adicionado com sucesso!");
@@ -196,6 +231,12 @@ export default function Dashboard() {
   const handleRemoveWidget = (id: string) => {
     setWidgets(prev => prev.filter(widget => widget.id !== id));
     toast.success("Widget removido com sucesso!");
+  };
+
+  const handleResizeWidget = (id: string, size: { width: number; height: number }) => {
+    setWidgets(prev => prev.map(widget => 
+      widget.id === id ? { ...widget, size } : widget
+    ));
   };
 
 
@@ -320,20 +361,21 @@ export default function Dashboard() {
       >
         <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
           <div className={cn(
-            "grid gap-3 transition-all duration-300",
+            "grid gap-4 transition-all duration-300 auto-fit-grid",
             isMobile 
               ? "grid-cols-1" 
-              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-            isMobile ? "gap-3" : "lg:gap-4 xl:gap-6"
-          )}>
+              : "grid-cols-[repeat(auto-fit,minmax(280px,1fr))]",
+            isMobile ? "gap-3" : "lg:gap-6"
+          )} style={{ gridAutoRows: 'min-content' }}>
             {widgets.map((widget) => (
               <div 
                 key={widget.id} 
-                className={getGridCols(widget.config.type)}
+                className="min-w-0"
               >
                 <SortableWidget 
                   widget={widget} 
                   onRemove={handleRemoveWidget}
+                  onResize={handleResizeWidget}
                 />
               </div>
             ))}

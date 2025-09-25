@@ -6,6 +6,8 @@ import { X, GripVertical, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import InteractiveChart from "./InteractiveChart";
 import { useData } from "@/contexts/DataContext";
+import { Resizable, ResizableBox } from 'react-resizable';
+import 'react-resizable/css/styles.css';
 import {
   Calendar,
   Users,
@@ -45,12 +47,44 @@ export interface DashboardWidgetProps {
   id: string;
   config: WidgetConfig;
   onRemove: (id: string) => void;
+  onResize?: (id: string, size: { width: number; height: number }) => void;
+  size?: { width: number; height: number };
   isDragging?: boolean;
 }
 
-export default function DashboardWidget({ id, config, onRemove, isDragging }: DashboardWidgetProps) {
+export default function DashboardWidget({ 
+  id, 
+  config, 
+  onRemove, 
+  onResize,
+  size = { width: 320, height: 280 },
+  isDragging 
+}: DashboardWidgetProps) {
   const { getStats, getChartData } = useData();
   const [isEditing, setIsEditing] = useState(false);
+
+  const getDefaultSize = () => {
+    switch (config.type) {
+      case 'stat-card':
+        return { width: 280, height: 140 };
+      case 'chart':
+        return { width: 400, height: 350 };
+      case 'funnel':
+        return { width: 600, height: 400 };
+      case 'actions':
+        return { width: 500, height: 200 };
+      default:
+        return { width: 320, height: 280 };
+    }
+  };
+
+  const widgetSize = size.width > 0 ? size : getDefaultSize();
+
+  const handleResize = (event: any, { size: newSize }: any) => {
+    if (onResize) {
+      onResize(id, newSize);
+    }
+  };
 
   const renderStatCard = (statType: StatCardConfig['statType']) => {
     const stats = getStats();
@@ -253,7 +287,53 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
 
   if (config.type === 'chart') {
     return (
-      <div className={cn("relative group", isDragging && "opacity-50")}>
+      <ResizableBox
+        width={widgetSize.width}
+        height={widgetSize.height}
+        onResize={handleResize}
+        minConstraints={[280, 250]}
+        maxConstraints={[800, 600]}
+        resizeHandles={['se']}
+        className={cn("relative group", isDragging && "opacity-50")}
+      >
+        <div className="w-full h-full">
+          <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
+              onClick={() => onRemove(id)}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+          <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-manipulation">
+            <div className="p-2 bg-background/90 rounded-lg hover:bg-primary/10 border border-border/50">
+              <GripVertical className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+          <div className="w-full h-full">
+            {renderContent()}
+          </div>
+        </div>
+      </ResizableBox>
+    );
+  }
+
+  return (
+    <ResizableBox
+      width={widgetSize.width}
+      height={widgetSize.height}
+      onResize={handleResize}
+      minConstraints={[240, 120]}
+      maxConstraints={[600, 500]}
+      resizeHandles={['se']}
+      className={cn("relative group", isDragging && "opacity-50")}
+    >
+      <Card className={cn(
+        "w-full h-full transition-all duration-200", 
+        config.type === 'funnel' && "futuristic-funnel"
+      )}>
         <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Button
             variant="ghost"
@@ -264,40 +344,17 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
             <X className="h-3 w-3" />
           </Button>
         </div>
+        
         <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-manipulation">
           <div className="p-2 bg-background/90 rounded-lg hover:bg-primary/10 border border-border/50">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
         </div>
-        {renderContent()}
-      </div>
-    );
-  }
-
-  return (
-    <Card className={cn(
-      "relative group transition-all duration-200", 
-      isDragging && "opacity-50 scale-95",
-      config.type === 'funnel' && "futuristic-funnel"
-    )}>
-      <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
-          onClick={() => onRemove(id)}
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-      
-      <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-manipulation">
-        <div className="p-2 bg-background/90 rounded-lg hover:bg-primary/10 border border-border/50">
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        
+        <div className="w-full h-full overflow-hidden">
+          {renderContent()}
         </div>
-      </div>
-      
-      {renderContent()}
-    </Card>
+      </Card>
+    </ResizableBox>
   );
 }
