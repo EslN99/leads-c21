@@ -202,9 +202,9 @@ export default function InteractiveChart({
             <IconComponent className="h-5 w-5 text-primary" />
             {title}
           </CardTitle>
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:min-w-0 sm:flex-1 sm:justify-end">
             <Select value={dataVariable} onValueChange={(value: DataVariable) => setDataVariable(value)}>
-              <SelectTrigger className="w-full sm:w-[160px] md:w-[140px] lg:w-[160px]">
+              <SelectTrigger className="w-full sm:w-40 min-w-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -216,7 +216,7 @@ export default function InteractiveChart({
               </SelectContent>
             </Select>
             <Select value={chartType} onValueChange={(value: ChartType) => setChartType(value)}>
-              <SelectTrigger className="w-full sm:w-[120px] md:w-[100px] lg:w-[120px]">
+              <SelectTrigger className="w-full sm:w-28 min-w-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
