@@ -238,64 +238,11 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-neon);
   }
   
-  /* Grid masonry para widgets redimensionáveis */
-  .auto-fit-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    grid-auto-rows: min-content;
-    align-items: start;
-  }
-  
-  /* Estilos para react-resizable */
-  .react-resizable {
-    position: relative;
-  }
-  
-  .react-resizable-handle {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: hsl(var(--primary));
-    border: 2px solid hsl(var(--background));
-    border-radius: 0 0 6px 0;
-    bottom: 0;
-    right: 0;
-    cursor: se-resize;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: 10;
-  }
-  
-  .react-resizable:hover .react-resizable-handle,
-  .react-resizable-handle:hover {
-    opacity: 0.8;
-  }
-  
-  .react-resizable-handle:hover {
-    opacity: 1;
-    background-color: hsl(var(--primary-hover));
-  }
-  
-  .react-resizable-handle::before {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-bottom: 8px solid hsl(var(--background));
-  }
-  
-  .react-resizable-handle::after {
-    content: '';
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    width: 3px;
-    height: 3px;
-    background-color: hsl(var(--primary-foreground));
-    border-radius: 50%;
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   
   .futuristic-funnel {
