@@ -47,7 +47,16 @@ const dataVariableOptions = [
   { value: 'follow-up', label: 'Follow-up' },
 ];
 
-const colors = ['#04BF8A', '#0A0A20', '#5EE0A9', '#CCCCCC', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+const colors = [
+  'hsl(var(--chart-1))', 
+  'hsl(var(--chart-2))', 
+  'hsl(var(--chart-3))', 
+  'hsl(var(--chart-4))', 
+  'hsl(var(--chart-5))',
+  'hsl(var(--primary))',
+  'hsl(var(--secondary))',
+  'hsl(var(--accent))',
+];
 
 export default function InteractiveChart({ 
   title, 
@@ -156,7 +165,7 @@ export default function InteractiveChart({
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="value" fill="#04BF8A" />
+            <Bar dataKey="value" fill="hsl(var(--primary))" />
           </BarChart>
         );
       case 'line':
@@ -166,7 +175,7 @@ export default function InteractiveChart({
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#04BF8A" strokeWidth={2} />
+            <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} />
           </LineChart>
         );
       case 'area':
@@ -176,7 +185,7 @@ export default function InteractiveChart({
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Area type="monotone" dataKey="value" stroke="#04BF8A" fill="#04BF8A" fillOpacity={0.3} />
+            <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
           </AreaChart>
         );
       default:
@@ -192,9 +201,9 @@ export default function InteractiveChart({
             <Icon className="h-5 w-5 text-primary" />
             {title}
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Select value={dataVariable} onValueChange={(value: DataVariable) => setDataVariable(value)}>
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-full sm:w-[160px] md:w-[140px] lg:w-[160px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -206,7 +215,7 @@ export default function InteractiveChart({
               </SelectContent>
             </Select>
             <Select value={chartType} onValueChange={(value: ChartType) => setChartType(value)}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-full sm:w-[120px] md:w-[100px] lg:w-[120px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

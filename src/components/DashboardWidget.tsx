@@ -166,7 +166,7 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
                 
                 <div className="absolute inset-0 rounded-2xl border border-white/20 group-hover:border-white/40 transition-colors duration-300"></div>
                 
-                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm border border-primary/20 rounded-lg px-4 py-2 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 min-w-max">
+                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-background/95 backdrop-blur-sm border border-primary/20 rounded-lg px-3 py-1.5 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50 min-w-max shadow-lg max-w-[200px]">
                   <div className="text-foreground text-center">{stage.name}</div>
                   <div className="text-primary font-bold text-center">{stage.value} leads</div>
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-border"></div>
@@ -264,8 +264,8 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
             <X className="h-3 w-3" />
           </Button>
         </div>
-        <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-          <div className="p-1 bg-background/80 rounded">
+        <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-manipulation">
+          <div className="p-2 bg-background/90 rounded-lg hover:bg-primary/10 border border-border/50">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
         </div>
@@ -291,8 +291,8 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
         </Button>
       </div>
       
-      <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
-        <div className="p-1 bg-background/80 rounded">
+      <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-manipulation">
+        <div className="p-2 bg-background/90 rounded-lg hover:bg-primary/10 border border-border/50">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
         </div>
       </div>
