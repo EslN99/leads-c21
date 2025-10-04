@@ -1,23 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import GridLayout, { Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import {
   Select,
   SelectContent,
@@ -47,34 +31,9 @@ import WidgetSelector from "@/components/WidgetSelector";
 interface DashboardWidgetItem {
   id: string;
   config: WidgetConfig;
+  layout?: Layout;
 }
 
-function SortableWidget({ widget, onRemove }: { widget: DashboardWidgetItem; onRemove: (id: string) => void }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: widget.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <DashboardWidget 
-        id={widget.id}
-        config={widget.config}
-        onRemove={onRemove}
-        isDragging={isDragging}
-      />
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const { addLead } = useData();
@@ -118,19 +77,23 @@ export default function Dashboard() {
     const defaultWidgets: DashboardWidgetItem[] = [
       {
         id: 'stat-1',
-        config: { type: 'stat-card', statType: 'agendamentos' }
+        config: { type: 'stat-card', statType: 'agendamentos' },
+        layout: { i: 'stat-1', x: 0, y: 0, w: 1, h: 1, static: true }
       },
       {
         id: 'stat-2', 
-        config: { type: 'stat-card', statType: 'leads' }
+        config: { type: 'stat-card', statType: 'leads' },
+        layout: { i: 'stat-2', x: 1, y: 0, w: 1, h: 1, static: true }
       },
       {
         id: 'stat-3',
-        config: { type: 'stat-card', statType: 'conversao' }
+        config: { type: 'stat-card', statType: 'conversao' },
+        layout: { i: 'stat-3', x: 2, y: 0, w: 1, h: 1, static: true }
       },
       {
         id: 'stat-4',
-        config: { type: 'stat-card', statType: 'ativos' }
+        config: { type: 'stat-card', statType: 'ativos' },
+        layout: { i: 'stat-4', x: 3, y: 0, w: 1, h: 1, static: true }
       },
       {
         id: 'chart-1',
@@ -140,7 +103,8 @@ export default function Dashboard() {
           icon: TrendingUp,
           chartType: 'pie',
           variable: 'canal-contato'
-        }
+        },
+        layout: { i: 'chart-1', x: 0, y: 1, w: 2, h: 2 }
       },
       {
         id: 'chart-2',
@@ -150,44 +114,50 @@ export default function Dashboard() {
           icon: Calendar,
           chartType: 'pie',
           variable: 'canal-agendamento'
-        }
+        },
+        layout: { i: 'chart-2', x: 2, y: 1, w: 2, h: 2 }
       },
       {
         id: 'funnel-1',
-        config: { type: 'funnel' }
+        config: { type: 'funnel' },
+        layout: { i: 'funnel-1', x: 0, y: 3, w: 4, h: 2, static: true }
       },
       {
         id: 'actions-1',
-        config: { type: 'actions' }
+        config: { type: 'actions' },
+        layout: { i: 'actions-1', x: 0, y: 5, w: 4, h: 1, static: true }
       }
     ];
     setWidgets(defaultWidgets);
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (active.id !== over?.id) {
-      setWidgets((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over?.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    setWidgets(prev => prev.map(widget => {
+      const layoutItem = newLayout.find(l => l.i === widget.id);
+      if (layoutItem) {
+        return { ...widget, layout: layoutItem };
+      }
+      return widget;
+    }));
   };
 
   const handleAddWidget = (config: WidgetConfig) => {
+    const newId = `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const maxY = Math.max(...widgets.map(w => (w.layout?.y || 0) + (w.layout?.h || 1)), 0);
+    
+    let defaultLayout: Layout;
+    if (config.type === 'chart') {
+      defaultLayout = { i: newId, x: 0, y: maxY, w: 2, h: 2 };
+    } else if (config.type === 'stat-card') {
+      defaultLayout = { i: newId, x: 0, y: maxY, w: 1, h: 1, static: true };
+    } else {
+      defaultLayout = { i: newId, x: 0, y: maxY, w: 4, h: 2, static: true };
+    }
+    
     const newWidget: DashboardWidgetItem = {
-      id: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: newId,
       config,
+      layout: defaultLayout,
     };
     setWidgets(prev => [...prev, newWidget]);
     toast.success("Widget adicionado com sucesso!");
@@ -222,20 +192,6 @@ export default function Dashboard() {
     toast.success("Lead adicionado com sucesso!");
   };
 
-  const getGridCols = (widgetType: string) => {
-    switch (widgetType) {
-      case 'stat-card':
-        return isMobile ? "col-span-1" : "col-span-1 sm:col-span-1 lg:col-span-1";
-      case 'chart':
-        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-2 xl:col-span-1";
-      case 'funnel':
-        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-3 xl:col-span-4";
-      case 'actions':
-        return isMobile ? "col-span-1" : "col-span-1 lg:col-span-3 xl:col-span-4";
-      default:
-        return "col-span-1";
-    }
-  };
 
   return (
     <div className={cn("space-y-4 relative", isMobile ? "space-y-3" : "space-y-6")}>
@@ -312,34 +268,52 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Drag and Drop Context */}
-      <DndContext 
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={widgets.map(w => w.id)} strategy={verticalListSortingStrategy}>
-          <div className={cn(
-            "grid gap-3 transition-all duration-300",
-            isMobile 
-              ? "grid-cols-1" 
-              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-            isMobile ? "gap-3" : "lg:gap-4 xl:gap-6"
-          )}>
-            {widgets.map((widget) => (
-              <div 
-                key={widget.id} 
-                className={getGridCols(widget.config.type)}
-              >
-                <SortableWidget 
-                  widget={widget} 
-                  onRemove={handleRemoveWidget}
-                />
-              </div>
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {/* Grid Layout */}
+      {!isMobile ? (
+        <GridLayout
+          className="layout"
+          layout={widgets.map(w => w.layout || { i: w.id, x: 0, y: 0, w: 2, h: 2 })}
+          cols={4}
+          rowHeight={150}
+          width={1200}
+          onLayoutChange={handleLayoutChange}
+          isDraggable={true}
+          isResizable={true}
+          compactType="vertical"
+          preventCollision={false}
+          resizeHandles={['se']}
+        >
+          {widgets.map((widget) => (
+            <div 
+              key={widget.id} 
+              className="grid-item"
+              data-grid={{
+                ...widget.layout,
+                static: widget.config.type !== 'chart'
+              }}
+            >
+              <DashboardWidget 
+                id={widget.id}
+                config={widget.config}
+                onRemove={handleRemoveWidget}
+                isDragging={false}
+              />
+            </div>
+          ))}
+        </GridLayout>
+      ) : (
+        <div className="space-y-3">
+          {widgets.map((widget) => (
+            <DashboardWidget 
+              key={widget.id}
+              id={widget.id}
+              config={widget.config}
+              onRemove={handleRemoveWidget}
+              isDragging={false}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Quick Add Lead Dialog (preserved for compatibility) */}
       <Dialog open={isAddLeadOpen} onOpenChange={setIsAddLeadOpen}>
