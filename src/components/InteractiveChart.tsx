@@ -263,7 +263,7 @@ export default function InteractiveChart({
         </div>
       </CardHeader>
       <CardContent className="px-2">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={400}>
           {renderChart()}
         </ResponsiveContainer>
       </CardContent>
