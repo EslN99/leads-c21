@@ -148,7 +148,10 @@ export default function InteractiveChart({
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) => {
+                const displayName = name.length > 12 ? name.substring(0, 12) + '...' : name;
+                return `${displayName}: ${(percent * 100).toFixed(0)}%`;
+              }}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
@@ -162,30 +165,51 @@ export default function InteractiveChart({
         );
       case 'bar':
         return (
-          <BarChart data={data}>
+          <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
+            <XAxis 
+              dataKey="name" 
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              interval={0}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
             <Bar dataKey="value" fill="hsl(var(--primary))" />
           </BarChart>
         );
       case 'line':
         return (
-          <LineChart data={data}>
+          <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
+            <XAxis 
+              dataKey="name" 
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              interval={0}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
             <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} />
           </LineChart>
         );
       case 'area':
         return (
-          <AreaChart data={data}>
+          <AreaChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
+            <XAxis 
+              dataKey="name" 
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              interval={0}
+              tick={{ fontSize: 11 }}
+            />
+            <YAxis tick={{ fontSize: 11 }} />
             <Tooltip />
             <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
           </AreaChart>
@@ -238,7 +262,7 @@ export default function InteractiveChart({
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-2">
         <ResponsiveContainer width="100%" height={300}>
           {renderChart()}
         </ResponsiveContainer>
