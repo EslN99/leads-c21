@@ -197,38 +197,38 @@ export default function InteractiveChart({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <IconComponent className="h-5 w-5 text-primary" />
-            {title}
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <IconComponent className="h-4 w-4 text-primary shrink-0" />
+            <span className="truncate">{title}</span>
           </CardTitle>
-          <div className="flex flex-col sm:flex-row gap-2 sm:min-w-0 sm:flex-1 sm:justify-end">
+          <div className="flex flex-wrap gap-2">
             <Select value={dataVariable} onValueChange={(value: DataVariable) => setDataVariable(value)}>
-              <SelectTrigger className="w-full sm:w-40 min-w-0">
-                <Database className="h-4 w-4 shrink-0" />
+              <SelectTrigger className="h-8 text-xs w-[140px]">
+                <Database className="h-3.5 w-3.5 shrink-0" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {dataVariableOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
                     {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={chartType} onValueChange={(value: ChartType) => setChartType(value)}>
-              <SelectTrigger className="w-full sm:w-28 min-w-0">
+              <SelectTrigger className="h-8 text-xs w-[100px]">
                 {chartTypeOptions.find(opt => opt.value === chartType)?.icon && (
-                  <>{React.createElement(chartTypeOptions.find(opt => opt.value === chartType)!.icon, { className: "h-4 w-4 shrink-0" })}</>
+                  <>{React.createElement(chartTypeOptions.find(opt => opt.value === chartType)!.icon, { className: "h-3.5 w-3.5 shrink-0" })}</>
                 )}
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {chartTypeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value} className="text-xs">
                     <div className="flex items-center gap-2">
-                      <option.icon className="h-4 w-4" />
+                      <option.icon className="h-3.5 w-3.5" />
                       {option.label}
                     </div>
                   </SelectItem>
