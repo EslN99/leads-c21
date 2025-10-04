@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { TrendingUp, BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon, Activity } from "lucide-react";
+import { TrendingUp, BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon, Activity, Database } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 
 type ChartType = 'pie' | 'bar' | 'line' | 'area';
@@ -205,6 +206,7 @@ export default function InteractiveChart({
           <div className="flex flex-col sm:flex-row gap-2 sm:min-w-0 sm:flex-1 sm:justify-end">
             <Select value={dataVariable} onValueChange={(value: DataVariable) => setDataVariable(value)}>
               <SelectTrigger className="w-full sm:w-40 min-w-0">
+                <Database className="h-4 w-4 shrink-0" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -217,6 +219,9 @@ export default function InteractiveChart({
             </Select>
             <Select value={chartType} onValueChange={(value: ChartType) => setChartType(value)}>
               <SelectTrigger className="w-full sm:w-28 min-w-0">
+                {chartTypeOptions.find(opt => opt.value === chartType)?.icon && (
+                  <>{React.createElement(chartTypeOptions.find(opt => opt.value === chartType)!.icon, { className: "h-4 w-4 shrink-0" })}</>
+                )}
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
