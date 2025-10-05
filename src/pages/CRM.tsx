@@ -10,6 +10,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import {
   Phone,
   Calendar,
   Clock,
@@ -19,6 +30,8 @@ import {
   Plus,
   Filter,
   Search,
+  X,
+  CalendarIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useData, Lead } from "@/contexts/DataContext";
@@ -158,13 +171,48 @@ export default function CRM() {
   const isMobile = useIsMobile();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  
+  // Estados dos filtros
+  const [filters, setFilters] = useState({
+    canal: "todos",
+    prioridade: "todos",
+    statusContato: "todos",
+    dataInicio: undefined as Date | undefined,
+    dataFim: undefined as Date | undefined,
+  });
+  
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  // Filtrar leads por busca
-  const filteredLeads = leads.filter(lead =>
-    lead.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.motivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.canal.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtrar leads por busca e filtros
+  const filteredLeads = leads.filter(lead => {
+    // Filtro de busca
+    const matchesSearch = lead.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.motivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.canal.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (!matchesSearch) return false;
+    
+    // Filtro de canal
+    if (filters.canal !== "todos" && lead.canal !== filters.canal) return false;
+    
+    // Filtro de prioridade
+    if (filters.prioridade !== "todos" && lead.prioridade !== filters.prioridade) return false;
+    
+    // Filtro de status de contato
+    if (filters.statusContato !== "todos" && lead.statusContato !== filters.statusContato) return false;
+    
+    // Filtro de data
+    const leadDate = new Date(lead.dataContato);
+    if (filters.dataInicio && leadDate < filters.dataInicio) return false;
+    if (filters.dataFim) {
+      const dataFimAjustada = new Date(filters.dataFim);
+      dataFimAjustada.setHours(23, 59, 59, 999);
+      if (leadDate > dataFimAjustada) return false;
+    }
+    
+    return true;
+  });
 
   // Agrupar leads por status kanban
   const leadsPorColuna = colunas.reduce((acc, coluna) => {
@@ -187,6 +235,33 @@ export default function CRM() {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+  };
+  
+  // Aplicar filtros
+  const applyFilters = () => {
+    let count = 0;
+    if (filters.canal !== "todos") count++;
+    if (filters.prioridade !== "todos") count++;
+    if (filters.statusContato !== "todos") count++;
+    if (filters.dataInicio) count++;
+    if (filters.dataFim) count++;
+    
+    setActiveFiltersCount(count);
+    setFilterDialogOpen(false);
+    toast.success(`Filtros aplicados: ${count} ativo(s)`);
+  };
+  
+  // Limpar filtros
+  const clearFilters = () => {
+    setFilters({
+      canal: "todos",
+      prioridade: "todos",
+      statusContato: "todos",
+      dataInicio: undefined,
+      dataFim: undefined,
+    });
+    setActiveFiltersCount(0);
+    toast.info("Filtros limpos");
   };
 
   return (
@@ -221,9 +296,21 @@ export default function CRM() {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline">
+            <Button 
+              variant="outline" 
+              onClick={() => setFilterDialogOpen(true)}
+              className="relative"
+            >
               <Filter className="h-4 w-4 mr-2" />
               Filtros
+              {activeFiltersCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full"
+                >
+                  {activeFiltersCount}
+                </Badge>
+              )}
             </Button>
           </div>
         </CardContent>
@@ -272,6 +359,140 @@ export default function CRM() {
           </div>
         ))}
       </div>
+
+      {/* Modal de Filtros */}
+      <Dialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen}>
+        <DialogContent className={cn(isMobile ? "w-[95vw] max-w-none" : "max-w-lg")}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros Avançados
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* Filtro de Canal */}
+            <div className="space-y-2">
+              <Label>Canal de Origem</Label>
+              <Select value={filters.canal} onValueChange={(value) => setFilters(prev => ({ ...prev, canal: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o canal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os canais</SelectItem>
+                  <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                  <SelectItem value="Instagram">Instagram</SelectItem>
+                  <SelectItem value="Facebook">Facebook</SelectItem>
+                  <SelectItem value="Site">Site</SelectItem>
+                  <SelectItem value="Indicação">Indicação</SelectItem>
+                  <SelectItem value="Google">Google</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Filtro de Prioridade */}
+            <div className="space-y-2">
+              <Label>Prioridade</Label>
+              <Select value={filters.prioridade} onValueChange={(value) => setFilters(prev => ({ ...prev, prioridade: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a prioridade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas as prioridades</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                  <SelectItem value="media">Média</SelectItem>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Filtro de Status de Contato */}
+            <div className="space-y-2">
+              <Label>Status do Contato</Label>
+              <Select value={filters.statusContato} onValueChange={(value) => setFilters(prev => ({ ...prev, statusContato: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os status</SelectItem>
+                  <SelectItem value="novo">Novo</SelectItem>
+                  <SelectItem value="contatado">Contatado</SelectItem>
+                  <SelectItem value="follow-up">Follow-up</SelectItem>
+                  <SelectItem value="qualificado">Qualificado</SelectItem>
+                  <SelectItem value="negociacao">Negociação</SelectItem>
+                  <SelectItem value="perdido">Perdido</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Filtro de Data Início */}
+            <div className="space-y-2">
+              <Label>Data Início</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filters.dataInicio && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filters.dataInicio ? format(filters.dataInicio, "dd/MM/yyyy") : "Selecione a data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={filters.dataInicio}
+                    onSelect={(date) => setFilters(prev => ({ ...prev, dataInicio: date }))}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            {/* Filtro de Data Fim */}
+            <div className="space-y-2">
+              <Label>Data Fim</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filters.dataFim && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filters.dataFim ? format(filters.dataFim, "dd/MM/yyyy") : "Selecione a data"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={filters.dataFim}
+                    onSelect={(date) => setFilters(prev => ({ ...prev, dataFim: date }))}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={clearFilters} className="flex-1">
+              <X className="h-4 w-4 mr-2" />
+              Limpar
+            </Button>
+            <Button onClick={applyFilters} className="flex-1">
+              Aplicar Filtros
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de Detalhes do Lead */}
       <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
