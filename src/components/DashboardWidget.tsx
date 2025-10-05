@@ -2,10 +2,27 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, GripVertical, Settings } from "lucide-react";
+import { X, GripVertical, Settings, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import InteractiveChart from "./InteractiveChart";
 import { useData } from "@/contexts/DataContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Calendar,
   Users,
@@ -49,8 +66,59 @@ export interface DashboardWidgetProps {
 }
 
 export default function DashboardWidget({ id, config, onRemove, isDragging }: DashboardWidgetProps) {
-  const { getStats, getChartData } = useData();
+  const { getStats, getChartData, addLead, leads } = useData();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+  const [newLead, setNewLead] = useState({
+    nome: '',
+    telefone: '',
+    motivo: '',
+    canal: 'Google' as const,
+  });
+
+  const handleAddLead = () => {
+    if (!newLead.nome || !newLead.telefone || !newLead.motivo) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+
+    addLead({
+      ...newLead,
+      dataContato: new Date().toISOString().split('T')[0],
+      statusContato: '1º Consulta',
+      agendamento: 'Não',
+      tipoConsulta: 'Outros',
+      objecao: 'Nenhuma',
+      followUp: 'Outro',
+      kanbanStatus: 'inicio',
+      prioridade: 'media',
+    });
+
+    setNewLead({ nome: '', telefone: '', motivo: '', canal: 'Google' });
+    setIsAddLeadOpen(false);
+    toast.success("Lead adicionado com sucesso!");
+  };
+
+  const handleNovoAgendamento = () => {
+    navigate('/crm');
+    toast.info("Navegando para CRM Kanban");
+  };
+
+  const handleFollowUp = () => {
+    const leadsComFollowUp = leads.filter(lead => 
+      lead.followUp === 'Prefere Aguardar' || 
+      lead.followUp === 'Outro' ||
+      (lead.followUp !== 'Agendado' && lead.followUp !== 'Não há interesse')
+    );
+    
+    if (leadsComFollowUp.length === 0) {
+      toast.info("Nenhum lead com follow-up pendente");
+    } else {
+      navigate('/leads');
+      toast.success(`${leadsComFollowUp.length} lead(s) com follow-up pendente`);
+    }
+  };
 
   const renderStatCard = (statType: StatCardConfig['statType']) => {
     const stats = getStats();
@@ -181,22 +249,100 @@ export default function DashboardWidget({ id, config, onRemove, isDragging }: Da
 
   const renderActions = () => {
     return (
-      <CardContent>
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-          <Button variant="outline" className="flex-col gap-2 h-16">
-            <Users className="h-6 w-6" />
-            Adicionar Lead
-          </Button>
-          <Button variant="outline" className="flex-col gap-2 h-16">
-            <Calendar className="h-6 w-6" />
-            Novo Agendamento
-          </Button>
-          <Button variant="outline" className="flex-col gap-2 h-16">
-            <Phone className="h-6 w-6" />
-            Follow-up Pendente
-          </Button>
-        </div>
-      </CardContent>
+      <>
+        <CardContent>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+            <Button 
+              variant="outline" 
+              className="flex-col gap-2 h-16 hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={() => setIsAddLeadOpen(true)}
+            >
+              <Users className="h-6 w-6" />
+              Adicionar Lead
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex-col gap-2 h-16 hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={handleNovoAgendamento}
+            >
+              <Calendar className="h-6 w-6" />
+              Novo Agendamento
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex-col gap-2 h-16 hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={handleFollowUp}
+            >
+              <Phone className="h-6 w-6" />
+              Follow-up Pendente
+            </Button>
+          </div>
+        </CardContent>
+
+        {/* Dialog para Adicionar Lead */}
+        <Dialog open={isAddLeadOpen} onOpenChange={setIsAddLeadOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Adicionar Novo Lead</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome *</Label>
+                <Input
+                  id="nome"
+                  value={newLead.nome}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, nome: e.target.value }))}
+                  placeholder="Nome completo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone *</Label>
+                <Input
+                  id="telefone"
+                  value={newLead.telefone}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, telefone: e.target.value }))}
+                  placeholder="(11) 99999-9999"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="motivo">Motivo da Consulta *</Label>
+                <Input
+                  id="motivo"
+                  value={newLead.motivo}
+                  onChange={(e) => setNewLead(prev => ({ ...prev, motivo: e.target.value }))}
+                  placeholder="Descreva o motivo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="canal">Canal de Contato</Label>
+                <Select 
+                  value={newLead.canal} 
+                  onValueChange={(value: any) => setNewLead(prev => ({ ...prev, canal: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Google">Google</SelectItem>
+                    <SelectItem value="Instagram">Instagram</SelectItem>
+                    <SelectItem value="YouTube">YouTube</SelectItem>
+                    <SelectItem value="Indicação">Indicação</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAddLead} className="flex-1">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar
+                </Button>
+                <Button variant="outline" onClick={() => setIsAddLeadOpen(false)}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   };
 
