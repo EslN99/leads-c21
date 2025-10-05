@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Tipos
 export interface Lead {
@@ -157,7 +157,24 @@ const initialLeads: Lead[] = [
 ];
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  // Inicializar com dados do localStorage ou dados iniciais
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    const savedLeads = localStorage.getItem('crm-leads');
+    if (savedLeads) {
+      try {
+        return JSON.parse(savedLeads);
+      } catch (error) {
+        console.error('Erro ao carregar leads do localStorage:', error);
+        return initialLeads;
+      }
+    }
+    return initialLeads;
+  });
+
+  // Salvar no localStorage sempre que os leads mudarem
+  useEffect(() => {
+    localStorage.setItem('crm-leads', JSON.stringify(leads));
+  }, [leads]);
 
   const addLead = (leadData: Omit<Lead, 'id'>) => {
     const newLead: Lead = {

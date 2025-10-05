@@ -380,12 +380,10 @@ export default function CRM() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos os canais</SelectItem>
-                  <SelectItem value="WhatsApp">WhatsApp</SelectItem>
-                  <SelectItem value="Instagram">Instagram</SelectItem>
-                  <SelectItem value="Facebook">Facebook</SelectItem>
-                  <SelectItem value="Site">Site</SelectItem>
-                  <SelectItem value="Indicação">Indicação</SelectItem>
                   <SelectItem value="Google">Google</SelectItem>
+                  <SelectItem value="Instagram">Instagram</SelectItem>
+                  <SelectItem value="YouTube">YouTube</SelectItem>
+                  <SelectItem value="Indicação">Indicação</SelectItem>
                 </SelectContent>
               </Select>
             </div>
